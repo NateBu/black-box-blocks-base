@@ -1,4 +1,4 @@
-/*
+/* -
 Calculate inertia and other useful parameters of a block shaped chassis
 
 Expected inputs:
