@@ -31,7 +31,6 @@ addbuttons = function(data,d3e) {
       var dy = (jj===0) ? off : "1.2em";
       text.append('tspan').attr({x:x+w/2,dy:dy}).text(label[jj]);
     }
-
   }
 
 };
