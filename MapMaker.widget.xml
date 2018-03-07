@@ -1,0 +1,14 @@
+<widget name="_:Base:MapMaker" buildtype="data" summary="-">
+	<calibration name="map" type="signal::_:Base:Map" defaultsource="file::_:Base:/data/example_map_1.json"/>
+	<script name="MapMaker" type="file::_:Base:/ui/MapMaker.js">
+		<quiz/>
+		<remap/>
+		<dependency/>
+		<signal/>
+	</script>
+	<file/>
+	<signal/>
+	<widget/>
+	<society/>
+	<collection/>
+</widget>

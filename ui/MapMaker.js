@@ -14,6 +14,7 @@ output = {
   },
   
   calibrate:function(context) {
+    console.log('map',context.calibration)
     this.polygons = context.calibration.map.shapes.map(function(s) {
       var v = s.vertices.map(function(v) {return [v.x,v.y]});
       return {'vertices':v,'editing':false,'type':s.type,'id':s.id};
