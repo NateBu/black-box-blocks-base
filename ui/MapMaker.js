@@ -19,7 +19,7 @@ output = {
       var v = s.vertices.map(function(v) {return [v.x,v.y]});
       return {'vertices':v,'editing':false,'type':s.type,'id':s.id};
     });
-    console.log('this.polygons.length = ', this.polygons.length);
+    console.log('this.polygons.length == ', this.polygons.length);
     if (this.g) this.draw();
   },
   
