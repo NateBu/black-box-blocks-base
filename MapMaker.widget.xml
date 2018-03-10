@@ -1,10 +1,13 @@
 <widget name="_:Base:MapMaker" buildtype="data" summary="-">
+	<calibration name="MapRequest" defaultvalue="mapreq" type="String"/>
+	<calibration name="MapResponse" defaultvalue="mapresp" type="String"/>
 	<calibration name="map" type="signal::_:Base:Map" defaultsource="file::_:Base:/data/example_map_1.json"/>
 	<script name="MapMaker" type="file::_:Base:/ui/MapMaker.js">
 		<quiz/>
 		<remap/>
 		<dependency/>
-		<signal/>
+		<signal name=":::MapRequest:::" alias="map_request" action="Subscribe" type="signal::_:Base:Map"/>
+		<signal name=":::MapResponse:::" alias="map_response" action="Publish" type="signal::_:Base:Map"/>
 	</script>
 	<file/>
 	<signal/>

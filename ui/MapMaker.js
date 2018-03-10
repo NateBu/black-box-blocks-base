@@ -11,15 +11,17 @@ output = {
     this.yScale = null;
     this.drag = null;
     this.g = null;
+    this.single_pixel_scale = 1;
   },
   
   calibrate:function(context) {
-    console.log('map',context.calibration)
-    this.polygons = context.calibration.map.shapes.map(function(s) {
-      var v = s.vertices.map(function(v) {return [v.x,v.y]});
-      return {'vertices':v,'editing':false,'type':s.type,'id':s.id};
-    });
-    console.log('this.polygons.length == ', this.polygons.length);
+    if (context.calibration.hasOwnProperty('map') && context.calibration.map.hasOwnProperty('shapes') ) {
+      this.polygons = context.calibration.map.shapes.map(function(s) {
+        var v = s.vertices.map(function(v) {return [v.x,v.y]});
+        return {'vertices':v,'editing':false,'type':s.type,'id':s.id};
+      });
+    }
+    this.context = context;
     if (this.g) this.draw();
   },
   
@@ -41,10 +43,11 @@ output = {
     function dist2(v, w) { return sqr(v.x - w.x) + sqr(v.y - w.y) }
     var l2 = dist2(v, w);
     if (l2 === 0) return false;
-    var tnrm = 4*thresh*thresh/l2;
+    var thresh2 = thresh*thresh;
     var t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+    var tnrm = thresh/Math.sqrt(l2);
     if (t<=tnrm || t>=(1-tnrm)) return false; // not between v and w or very close to v/w
-    return dist2(p, { x: v.x + t * (w.x - v.x), y: v.y + t * (w.y - v.y) }) < thresh*thresh;
+    return dist2(p, { x: v.x + t * (w.x - v.x), y: v.y + t * (w.y - v.y) }) < thresh2;
   },
   
   polygonColor:function(poly) {
@@ -66,7 +69,7 @@ output = {
         .attr('is-handle', 'true')
         .style({cursor: 'move'})
         .on('dblclick', function (d,i) {
-          
+          d3.event.preventDefault();
           d3.select(this).remove();       // Remove the circle handle
           poly.vertices.splice(i,1);      // Remove point from vertices
           if (poly.vertices.length<3) {   // Remove the whole polygon
@@ -106,11 +109,8 @@ output = {
           return d.vertices.map(function(p) { return [self.xScale(p[0]), self.yScale(p[1])]; });
         })
         .style('fill',color)
-        .on('click', function(d,i) { 
-          //console.log(this,d,i)
-        })
         .on('dblclick', function(d,i) { 
-          d.editing = !d.editing ;
+          d.editing = !d.editing ; 
           var parent = d3.select(this.parentNode);
           if (d.editing) {
             // Add handles
@@ -214,7 +214,7 @@ output = {
           var p1 = this.polygons[i].vertices[j];
           p0 = {x:this.xScale(p0[0]),y:this.yScale(p0[1])};
           p1 = {x:this.xScale(p1[0]),y:this.yScale(p1[1])};
-          if (this.onsegment({x:xy[0],y:xy[1]}, p0, p1, this.radius)) {
+          if (this.onsegment({x:xy[0],y:xy[1]}, p0, p1, this.radius)) { // in screen coordinates
             this.polygons[i].vertices.splice(j,0,[xG,yG]);
             this.drawpoly(this.polygons[i]);
             return;
@@ -242,7 +242,8 @@ output = {
   },
   
   keyUp:function(self) {
-    if (d3.event.keyCode==16) {
+    var key = d3.event.keyCode;
+    if (key==16) {
       if (this.points.length > 2) {
         var id = Math.random().toString(36).slice(2);
         var typ = ((this.polygons.length % 2)===0) ? 'drivable' : 'obstacle';
@@ -251,10 +252,23 @@ output = {
       this.drawunfinished();
       this.drawpoly(this.polygons[this.polygons.length-1]);
       this.drawing = false;
+    } else if (key == 77) {
+      this.map_request({});
     }
+  },
+
+  map_request:function(msg) {
+    var resp = {id:0,attributes:[],shapes:[]};
+    for (var ii=0; ii<this.polygons.length; ii++) {
+      var p = this.polygons[ii];
+      var v = p.vertices.map(function(v) {return {x:v[0],y:v[1]};});
+      resp.shapes.push({id:p.id,type:p.type,attributes:[],vertices:v});
+    }
+    this.context.publishers.map_response(resp);
   },
   
   zoom:function(self) {
+    this.single_pixel_scale = this.xScale.invert(1)-this.xScale.invert(0);
     this.draw();
   }
 }
