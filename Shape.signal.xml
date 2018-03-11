@@ -1,3 +1,7 @@
 <signal name="_:Base:Shape">
 	<society/>
+	<element name="id" type="int32"/>
+	<element name="type" type="string"/>
+	<element name="attributes" length="0" type="signal::_:Base:KeyValue"/>
+	<element name="vertices" length="0" type="signal::_:Base:Point2D"/>
 </signal>
