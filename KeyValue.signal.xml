@@ -1,0 +1,5 @@
+<signal name="_:Base:KeyValue">
+	<element name="key" type="string"/>
+	<element name="value" type="string"/>
+	<society/>
+</signal>
