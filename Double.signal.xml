@@ -1,5 +1,5 @@
 <signal name="_:Base:Double">
+	<society/>
 	<element name="id" type="int32"/>
 	<element name="value" type="float64"/>
-	<society/>
 </signal>
