@@ -17,6 +17,7 @@ playback = {
   replay:function(parent,dataname,data_handler) {
     // data must have a time array (e.g. data.time = [0,0.1,0.2,...])
     // The index of the time will be passed back to data_handler
+    var tstart = Date.now();
     var dt = 0.05; // (sec) 20 hz
     var self = this;
     var data = parent[dataname];
@@ -30,15 +31,16 @@ playback = {
     var prcnt = Math.max(0,Math.min(1,self.playback_.percent));
     var ii = Math.round(prcnt*(n-1));
     var t_total = data.time[n-1]-data.time[0];
-    setTimeout(function() {
-      parent[data_handler](ii);
-      if (self.playback_.isplaying && prcnt<1 && n>1) {
-        self.playback_.percent += (dt/t_total)*self.playback_.rate;
-        x3.set_playback_percent(self.playback_.percent);
+    parent[data_handler](ii);
+    if (self.playback_.isplaying && prcnt<1 && n>1) {
+      self.playback_.percent += (dt/t_total)*self.playback_.rate;
+      x3.set_playback_percent(self.playback_.percent);
+      var dt_ = Math.max(1,dt*1000 - (Date.now()-tstart));
+      setTimeout(function() {
         self.replay(parent,dataname,data_handler);
-      } else if (self.playback_.isplaying) {
-        x3.set_playback_isplaying(false);
-      }
-    },dt*1000)
+      },dt_)
+    } else if (self.playback_.isplaying) {
+      x3.set_playback_isplaying(false);
+    }
   }
 }
