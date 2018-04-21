@@ -15,6 +15,8 @@ output = {
   },
   
   calibrate:function(context) {
+    this.polygons = []; this.points = []
+    if (this.g) this.draw();
     if (context.calibration.hasOwnProperty('map') && context.calibration.map.hasOwnProperty('shapes') ) {
       this.polygons = context.calibration.map.shapes.map(function(s) {
         var v = s.vertices.map(function(v) {return [v.x,v.y]});
@@ -36,6 +38,16 @@ output = {
     });
     this.g = g;
     this.draw();
+  },
+  
+  to_map:function() {
+    var resp = {id:0,attributes:[],shapes:[]};
+    for (var ii=0; ii<this.polygons.length; ii++) {
+      var p = this.polygons[ii];
+      var v = p.vertices.map(function(v) {return {x:v[0],y:v[1]};});
+      resp.shapes.push({id:p.id,type:p.type,attributes:[],vertices:v});
+    }
+    return resp;
   },
   
   onsegment:function(p, v, w, thresh) {
@@ -245,26 +257,24 @@ output = {
     var key = d3.event.keyCode;
     if (key==16) {
       if (this.points.length > 2) {
-        var id = Math.random().toString(36).slice(2);
-        var typ = ((this.polygons.length % 2)===0) ? 'drivable' : 'obstacle';
-        this.polygons.push({'vertices':this.points.splice(0),'id':id,'type':typ,'editing':true}); // move unclosed point to the closed set
+        var id = math.random().toString(36).slice(2);
+        var v = this.points.splice(0);
+        var area = polygon_area.signed_area(v.map(function(vi) {
+          return {x:vi[0],y:vi[1]};
+        }));
+        var typ = (area > 0) ? 'drivable' : 'obstacle';
+        this.polygons.push({'vertices':v,'id':id,'type':typ,'editing':true}); // move unclosed point to the closed set
       }
       this.drawunfinished();
       this.drawpoly(this.polygons[this.polygons.length-1]);
       this.drawing = false;
     } else if (key == 77) {
-      this.map_request({});
+      this.context.calibration.__set__('map',this.to_map());
     }
   },
-
+  
   map_request:function(msg) {
-    var resp = {id:0,attributes:[],shapes:[]};
-    for (var ii=0; ii<this.polygons.length; ii++) {
-      var p = this.polygons[ii];
-      var v = p.vertices.map(function(v) {return {x:v[0],y:v[1]};});
-      resp.shapes.push({id:p.id,type:p.type,attributes:[],vertices:v});
-    }
-    this.context.publishers.map_response(resp);
+    this.context.publishers.map_response(this.to_map());
   },
   
   zoom:function(self) {
