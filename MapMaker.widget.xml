@@ -2,11 +2,11 @@
 	<society/>
 	<calibration name="MapRequest" defaultvalue="mapreq" type="String"/>
 	<calibration name="MapResponse" defaultvalue="mapresp" type="String"/>
-	<calibration name="map" type="signal::_:Base:Map" defaultsource="file::_:Base:/data/example_map_1.json"/>
+	<calibration name="map" type="signal::_:Base:Mapx" defaultsource="file::_:Base:/data/example_map_1.json"/>
 	<file name="polygon_area" type="file::_:Base:/ui/polygon_area.js"/>
 	<file name="--" type="file::_:Base:/ui/MapMaker.js"/>
-	<signal name=":::MapRequest:::" action="Subscribe" jsmethod="map_request" type="signal::_:Base:Map"/>
-	<signal name=":::MapResponse:::" action="Publish" jsmethod="map_response" type="signal::_:Base:Map"/>
+	<signal name=":::MapRequest:::" action="Subscribe" jsmethod="map_request" type="signal::_:Base:Mapx"/>
+	<signal name=":::MapResponse:::" action="Publish" jsmethod="map_response" type="signal::_:Base:Mapx"/>
 	<widget/>
 	<collection/>
 </widget>

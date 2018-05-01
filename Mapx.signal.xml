@@ -1,4 +1,4 @@
-<signal name="_:Base:Map">
+<signal name="_:Base:Mapx">
 	<society/>
 	<element name="id" type="int32"/>
 	<element name="attributes" length="0" type="signal::_:Base:KeyValue"/>
