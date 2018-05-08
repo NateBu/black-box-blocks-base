@@ -17,7 +17,7 @@ output = {
   calibrate:function(context) {
     this.polygons = []; this.points = []
     if (this.g) this.draw();
-    if (context.calibration.hasOwnProperty('map') && context.calibration.map.hasOwnProperty('shapes') ) {
+    if (context.calibration.map && context.calibration.map.hasOwnProperty('shapes') ) {
       this.polygons = context.calibration.map.shapes.map(function(s) {
         var v = s.vertices.map(function(v) {return [v.x,v.y]});
         return {'vertices':v,'editing':false,'type':s.type,'id':s.id};
