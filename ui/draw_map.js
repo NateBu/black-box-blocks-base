@@ -3,21 +3,29 @@ draw_new_map = function(map,g,xscale,yscale) {
   //for (var ii = 0; ii < map.shapes.length; ii++) {
     //this.g.selectAll('g.shape_id'+poly.id).remove();
     //var g = this.g.append('g')
-    //  .classed('shape_id'+poly.id,true)
-    //  .classed('shape',true)
+    //  
     //  .attr('shape_id',poly.id,true);
   //}
-    //g.selectAll('.id-'+map.id).remove();
-    //var thismap = g.append('g').classed('id-'+map.id);
-    g.selectAll('polygon').remove()
-      .data(map.shapes)
-      .enter().append('polygon')
-        .attr('points', function(d,i) { 
-          return d.vertices.map(function(p) { return [xscale(p.x), yscale(p.y)]; });
+    var colors = {'drivable':'blue','obstacle':'red','reference':'orange'};
+    var thismap = g.selectAll('.id-'+map._id);
+    var mappolygons = null;
+    if (thismap.size() === 0) {
+      thismap = g.append('g').classed('id-'+map._id,true);
+      mappolygons = thismap.selectAll('polygon').remove()
+        .data(map._mapShapes)
+        .enter().append('polygon').style('fill',function(d,i) { 
+          return colors[d._shapeType] || 'black';
         })
-        .style('fill','red')
+        .classed('mapshape',true)
         .style('opacity',0.3)
         .style('stroke','white');
+    } else {
+      mappolygons = thismap.selectAll('polygon');
+    }
+    
+    mappolygons.attr('points', function(d,i) { 
+      return d._vertices.map(function(p) { return [xscale(p.x), yscale(p.y)]; });
+    });
 }
 /*
     var self = this;
