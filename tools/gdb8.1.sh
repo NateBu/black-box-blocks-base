@@ -8,4 +8,4 @@ make -C gdb install
 #cp -r gdb/data-directory/* ..
 cd ..
 rm -r gdb-8.1
-rm -r gdb-8.1.tar.gz
+rm -r gdb-8.1.tar.xz
