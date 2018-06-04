@@ -1,7 +1,7 @@
 {
-  "address": "git@github.com:NateBu/black-box-blocks-base.git",
+  "name": "Base",
   "hash_": null,
-  "dependencies": [],
+  "address": "git@github.com:NateBu/black-box-blocks-base.git",
   "_id": "5b10cf108b3c2807e3c8cd05",
-  "name": "Base"
+  "dependencies": []
 }
