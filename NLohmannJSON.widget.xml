@@ -1,0 +1,9 @@
+<widget name="_:Base:NLohmannJSON" buildtype="dynamiclibrary" summary="-">
+	<calibration/>
+	<file name="build.sh" type="file::_:Base:/tools/nlohmann_json.sh"/>
+	<signal/>
+	<widget/>
+	<society/>
+	<build command="bash ./build.sh &amp;&amp; rm build.sh"/>
+	<collection/>
+</widget>
