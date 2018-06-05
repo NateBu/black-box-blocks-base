@@ -1,5 +1,5 @@
 {
-  "dependencies": [],
   "name": "Base",
+  "dependencies": [],
   "address": "git@github.com:NateBu/black-box-blocks-base.git"
 }

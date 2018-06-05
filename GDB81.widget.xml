@@ -1,9 +1,9 @@
 <widget name="_:Base:GDB81" buildtype="executable" summary="-">
+	<society/>
 	<calibration/>
 	<file name="build.sh" type="file::_:Base:/tools/gdb8.1.sh"/>
 	<signal/>
 	<widget/>
-	<society/>
 	<launch command="gdb"/>
 	<build command="bash build.sh"/>
 	<depend command="export PATH=$PATH::::__installpath__:::"/>

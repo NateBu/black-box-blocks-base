@@ -1,8 +1,8 @@
 <widget name="_:Base:Ros2ardent" buildtype="data" summary="-">
+	<society/>
 	<calibration/>
 	<file name="build.sh" type="file::_:Base:/tools/ros2.sh"/>
 	<signal/>
 	<widget/>
-	<society/>
 	<collection/>
 </widget>

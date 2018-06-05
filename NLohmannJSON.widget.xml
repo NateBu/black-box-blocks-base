@@ -1,9 +1,9 @@
 <widget name="_:Base:NLohmannJSON" buildtype="dynamiclibrary" summary="-">
+	<society/>
 	<calibration/>
 	<file name="build.sh" type="file::_:Base:/tools/nlohmann_json.sh"/>
 	<signal/>
 	<widget/>
-	<society/>
 	<build command="bash ./build.sh &amp;&amp; rm build.sh"/>
 	<depend command="export CPATH=$CPATH::::__installpath__:::/include"/>
 	<collection/>
