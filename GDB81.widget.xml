@@ -4,7 +4,8 @@
 	<signal/>
 	<widget/>
 	<society/>
-	<launch command="gdb" config="export PATH=$PATH:$DIR &amp;&amp; cd /usr/bin &amp;&amp; sudo ln -s $DIR/gdb gdb"/>
+	<launch command="gdb"/>
 	<build command="bash build.sh"/>
+	<depend command="export PATH=$PATH::::__installpath__:::"/>
 	<collection/>
 </widget>
