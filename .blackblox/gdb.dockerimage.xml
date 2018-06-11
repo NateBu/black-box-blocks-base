@@ -1,0 +1,5 @@
+<dockerimage name="_:Base:gdb">
+	<from/>
+	<layer name="/tools/gdb8.1.sh" type="file::_:Base:/tools/gdb8.1.sh"/>
+	<society/>
+</dockerimage>
