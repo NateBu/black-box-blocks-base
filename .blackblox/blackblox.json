@@ -1,7 +1,6 @@
 {
-  "noloadlist": [],
-  "loadlist": [],
   "name": "Base",
-  "address": "git@github.com:NateBu/black-box-blocks-base.git",
+  "loadlist": [],
+  "noloadlist": [],
   "dependencies": []
 }
