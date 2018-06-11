@@ -1,6 +1,6 @@
 {
-  "name": "Base",
+  "dependencies": [],
   "loadlist": [],
-  "noloadlist": [],
-  "dependencies": []
+  "name": "Base",
+  "noloadlist": []
 }
