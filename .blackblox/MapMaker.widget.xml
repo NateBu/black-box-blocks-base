@@ -8,5 +8,6 @@
 	<signal name=":::MapRequest:::" action="Subscribe" jsmethod="map_request" type="signal::_:Base:Mapx"/>
 	<signal name=":::MapResponse:::" action="Publish" jsmethod="map_response" type="signal::_:Base:Mapx"/>
 	<widget/>
+	<pathmap/>
 	<collection/>
 </widget>

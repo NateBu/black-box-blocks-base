@@ -5,7 +5,7 @@ WORKDIR gdb-8.1/
 RUN ./configure --prefix=/usr/local --with-python=/usr/bin/python3 --with-system-readline --without-guile &amp;&amp; make -j8
 RUN make -C gdb install
 RUN cd .. &amp;&amp; rm -r gdb-8.1 &amp;&amp; rm -r gdb-8.1.tar.xz">
+<society/>
 <from/>
 <pathmap/>
-<society/>
 </dockerimage>
