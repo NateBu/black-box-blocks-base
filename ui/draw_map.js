@@ -6,7 +6,8 @@ draw_new_map = function(map,g,xscale,yscale) {
     //  
     //  .attr('shape_id',poly.id,true);
   //}
-    var colors = {'drivable':'blue','obstacle':'red','reference':'orange'};
+    var colors = {'drivable':'blue','obstacle':'red','reference':'orange',
+              '"drivable"':'blue','"obstacle"':'red','"reference"':'orange'};
     var thismap = g.selectAll('.id-'+map._id);
     var mappolygons = null;
     if (thismap.size() === 0) {
