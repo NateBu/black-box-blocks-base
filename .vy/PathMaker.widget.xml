@@ -1,0 +1,11 @@
+<widget name="_:Base:PathMaker" buildtype="data" summary="-">
+	<calibration name="PathRequest" defaultvalue="pathreq" type="String"/>
+	<calibration name="PathResponse" defaultvalue="pathresp" type="String"/>
+	<calibration name="pathlist" defaultvalue="{}" type="signal::_:Base:PathList"/>
+	<pathmap/>
+	<file name="--" type="file::_:Base:/ui/PathMaker.js"/>
+	<signal/>
+	<widget/>
+	<society/>
+	<collection/>
+</widget>
