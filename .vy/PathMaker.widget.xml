@@ -1,4 +1,5 @@
 <widget name="_:Base:PathMaker" buildtype="data" summary="-">
+	<society/>
 	<calibration name="PathRequest" defaultvalue="pathreq" type="String"/>
 	<calibration name="PathResponse" defaultvalue="pathresp" type="String"/>
 	<calibration name="pathlist" defaultvalue="{}" type="signal::_:Base:PathList"/>
@@ -6,6 +7,5 @@
 	<file name="--" type="file::_:Base:/ui/PathMaker.js"/>
 	<signal/>
 	<widget/>
-	<society/>
 	<collection/>
 </widget>
