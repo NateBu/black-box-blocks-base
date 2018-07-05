@@ -78,6 +78,7 @@ output = {
           return d.vertices.map(function(p) { return [self.xScale(p.x), self.yScale(p.y)]; });
         })
         .style('fill',color)
+        .style('fill-opacity',0.4)
         .on('dblclick', function(d,i) {
           var parent = d3.select(this.parentNode);
           if (self.editing === idx) {
