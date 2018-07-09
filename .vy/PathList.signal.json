@@ -1,0 +1,16 @@
+{
+  "name": "_:Base:PathList",
+  "society": [],
+  "#thingtype": "signal",
+  "element": [
+    {
+      "name": "id",
+      "type": "int32"
+    },
+    {
+      "name": "paths",
+      "length": 0,
+      "type": "signal::_:Base:Shape"
+    }
+  ]
+}

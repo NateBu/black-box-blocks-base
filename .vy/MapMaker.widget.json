@@ -1,0 +1,52 @@
+{
+  "name": "_:Base:MapMaker",
+  "society": [],
+  "#thingtype": "widget",
+  "calibration": [
+    {
+      "name": "MapRequest",
+      "defaultvalue": "mapreq",
+      "type": "String"
+    },
+    {
+      "name": "MapResponse",
+      "defaultvalue": "mapresp",
+      "type": "String"
+    },
+    {
+      "name": "map",
+      "hidden": "true",
+      "type": "signal::_:Base:Mapx",
+      "defaultsource": "file::_:Base:/data/example_map_1.json"
+    }
+  ],
+  "file": [
+    {
+      "name": "polygon_area",
+      "type": "file::_:Base:/ui/polygon_area.js"
+    },
+    {
+      "name": "--",
+      "type": "file::_:Base:/ui/MapMaker.js"
+    }
+  ],
+  "signal": [
+    {
+      "name": ":::MapRequest:::",
+      "action": "Subscribe",
+      "jsmethod": "map_request",
+      "type": "signal::_:Base:Mapx"
+    },
+    {
+      "name": ":::MapResponse:::",
+      "action": "Publish",
+      "jsmethod": "map_response",
+      "type": "signal::_:Base:Mapx"
+    }
+  ],
+  "widget": [],
+  "pathmap": [],
+  "buildtype": "data",
+  "summary": "-",
+  "collection": {}
+}

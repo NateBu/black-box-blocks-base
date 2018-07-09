@@ -1,5 +1,0 @@
-<signal name="_:Base:PathList">
-	<society/>
-	<element name="id" type="int32"/>
-	<element name="paths" length="0" type="signal::_:Base:Shape"/>
-</signal>
