@@ -1,7 +1,7 @@
 {
+  "#thingtype": "widget",
   "name": "_:Base:NLohmannJSON",
   "society": [],
-  "#thingtype": "widget",
   "calibration": [],
   "file": [
     {
@@ -17,7 +17,6 @@
     }
   ],
   "pathmap": [],
-  "buildtype": "package",
   "summary": "-",
   "collection": {}
 }

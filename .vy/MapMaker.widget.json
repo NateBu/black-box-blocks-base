@@ -1,7 +1,7 @@
 {
+  "#thingtype": "widget",
   "name": "_:Base:MapMaker",
   "society": [],
-  "#thingtype": "widget",
   "calibration": [
     {
       "name": "MapRequest",
@@ -15,7 +15,7 @@
     },
     {
       "name": "map",
-      "hidden": "true",
+      "hidden": true,
       "type": "signal::_:Base:Mapx",
       "defaultsource": "file::_:Base:/data/example_map_1.json"
     }
@@ -46,7 +46,6 @@
   ],
   "widget": [],
   "pathmap": [],
-  "buildtype": "data",
   "summary": "-",
   "collection": {}
 }

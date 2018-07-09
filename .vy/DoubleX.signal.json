@@ -1,7 +1,7 @@
 {
+  "#thingtype": "signal",
   "name": "_:Base:DoubleX",
   "society": [],
-  "#thingtype": "signal",
   "element": [
     {
       "name": "id",

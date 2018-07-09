@@ -1,7 +1,7 @@
 {
+  "#thingtype": "signal",
   "name": "_:Base:KeyValue",
   "society": [],
-  "#thingtype": "signal",
   "element": [
     {
       "name": "key",

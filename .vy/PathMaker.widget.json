@@ -1,7 +1,7 @@
 {
+  "#thingtype": "widget",
   "name": "_:Base:PathMaker",
   "society": [],
-  "#thingtype": "widget",
   "calibration": [
     {
       "name": "PathRequest",
@@ -15,7 +15,7 @@
     },
     {
       "name": "pathlist",
-      "hidden": "true",
+      "hidden": true,
       "defaultvalue": "{}",
       "type": "signal::_:Base:PathList"
     }
@@ -29,7 +29,6 @@
   ],
   "signal": [],
   "widget": [],
-  "buildtype": "data",
   "summary": "-",
   "collection": {}
 }

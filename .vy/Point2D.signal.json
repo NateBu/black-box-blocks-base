@@ -1,7 +1,7 @@
 {
+  "#thingtype": "signal",
   "name": "_:Base:Point2D",
   "society": [],
-  "#thingtype": "signal",
   "element": [
     {
       "name": "x",

@@ -1,7 +1,7 @@
 {
+  "#thingtype": "signal",
   "name": "_:Base:Mapx",
   "society": [],
-  "#thingtype": "signal",
   "element": [
     {
       "name": "id",

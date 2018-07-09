@@ -1,7 +1,7 @@
 {
+  "#thingtype": "widget",
   "name": "_:Base:Ros2ardent",
   "society": [],
-  "#thingtype": "widget",
   "calibration": [],
   "file": [
     {
@@ -12,7 +12,6 @@
   "signal": [],
   "widget": [],
   "pathmap": [],
-  "buildtype": "data",
   "summary": "-",
   "collection": {}
 }
