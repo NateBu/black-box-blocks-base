@@ -1,0 +1,15 @@
+{
+  "name": "_:Base:DoubleX",
+  "society": [],
+  "#thingtype": "signal",
+  "element": [
+    {
+      "name": "id",
+      "type": "int32"
+    },
+    {
+      "name": "value",
+      "type": "float64"
+    }
+  ]
+}

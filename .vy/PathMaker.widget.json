@@ -1,0 +1,35 @@
+{
+  "name": "_:Base:PathMaker",
+  "society": [],
+  "#thingtype": "widget",
+  "calibration": [
+    {
+      "name": "PathRequest",
+      "defaultvalue": "pathreq",
+      "type": "String"
+    },
+    {
+      "name": "PathResponse",
+      "defaultvalue": "pathresp",
+      "type": "String"
+    },
+    {
+      "name": "pathlist",
+      "hidden": "true",
+      "defaultvalue": "{}",
+      "type": "signal::_:Base:PathList"
+    }
+  ],
+  "pathmap": [],
+  "file": [
+    {
+      "name": "--",
+      "type": "file::_:Base:/ui/PathMaker.js"
+    }
+  ],
+  "signal": [],
+  "widget": [],
+  "buildtype": "data",
+  "summary": "-",
+  "collection": {}
+}

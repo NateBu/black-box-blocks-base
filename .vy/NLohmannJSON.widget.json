@@ -1,0 +1,23 @@
+{
+  "name": "_:Base:NLohmannJSON",
+  "society": [],
+  "#thingtype": "widget",
+  "calibration": [],
+  "file": [
+    {
+      "name": "build.sh",
+      "type": "file::_:Base:/tools/nlohmann_json.sh"
+    }
+  ],
+  "signal": [],
+  "widget": [],
+  "build": [
+    {
+      "command": "bash ./build.sh && rm build.sh"
+    }
+  ],
+  "pathmap": [],
+  "buildtype": "package",
+  "summary": "-",
+  "collection": {}
+}

@@ -1,0 +1,25 @@
+{
+  "name": "_:Base:Shape",
+  "society": [],
+  "#thingtype": "signal",
+  "element": [
+    {
+      "name": "id",
+      "type": "int32"
+    },
+    {
+      "name": "type",
+      "type": "string"
+    },
+    {
+      "name": "attributes",
+      "length": 0,
+      "type": "signal::_:Base:KeyValue"
+    },
+    {
+      "name": "vertices",
+      "length": 0,
+      "type": "signal::_:Base:Point2D"
+    }
+  ]
+}

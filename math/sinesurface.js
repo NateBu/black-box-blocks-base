@@ -7,10 +7,9 @@ sinesurface = function(seed,gridd,maxamp,nfacets) {
     var wvl = Math.max(.1,Math.random())*gridd;
     var phi = Math.PI*Math.random();
     var psi = Math.PI*Math.random();
-    waves.push([amp,wvl,phi,psi])
+    waves.push({'amplitude':amp,'wavelength':wvl,'azimuth':phi,'phase':psi})
   }
   //waves = [[0.0,10.0,Math.PI/2.0,0.1]]
-  
   
   var vertices = [];
   var facets = [];
@@ -20,10 +19,10 @@ sinesurface = function(seed,gridd,maxamp,nfacets) {
     for (ii = 0; ii < waves.length; ii++) {
       // Length along wave ii (normalized to wavelength)
       // Each wave has [amplitude, wavelength, direction, phase]
-      var amp = waves[ii][0]; // amplitude
-      var wvl = waves[ii][1]; // wavelength
-      var phi = waves[ii][2]; // direction
-      var psi = waves[ii][3]; // phase
+      var amp = waves[ii].amplitude;
+      var wvl = waves[ii].wavelength;
+      var phi = waves[ii].azimuth;
+      var psi = waves[ii].phase
       var cq = Math.cos(phi);
       var sq = Math.sin(phi);
       var L = (x*cq + y*sq)/wvl;
@@ -39,10 +38,10 @@ sinesurface = function(seed,gridd,maxamp,nfacets) {
     for (ii = 0; ii < waves.length; ii++) {
       // Length along wave ii (normalized to wavelength)
       // Each wave has [amplitude, wavelength, direction, phase]
-      var amp = waves[ii][0]; // amplitude
-      var wvl = waves[ii][1]; // wavelength
-      var phi = waves[ii][2]; // direction
-      var psi = waves[ii][3]; // phase
+      var amp = waves[ii].amplitude;
+      var wvl = waves[ii].wavelength;
+      var phi = waves[ii].azimuth;
+      var psi = waves[ii].phase;
       var cq = Math.cos(phi);
       var sq = Math.sin(phi);
       var L = (x*cq + y*sq)/wvl;  var dLdx = cq/wvl;      var dLdy = sq/wvl;
