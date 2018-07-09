@@ -1,5 +1,0 @@
-<signal name="_:Base:Point2D">
-	<society/>
-	<element name="x" type="float64"/>
-	<element name="y" type="float64"/>
-</signal>
