@@ -1,7 +1,5 @@
 {
   "#thingtype": "signal",
-  "name": "_:Base:DoubleX",
-  "society": [],
   "element": [
     {
       "name": "id",
@@ -11,5 +9,8 @@
       "name": "value",
       "type": "float64"
     }
+  ],
+  "name": "_:Base:DoubleX",
+  "society": [
   ]
 }

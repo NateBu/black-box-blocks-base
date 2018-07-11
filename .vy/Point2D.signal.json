@@ -1,7 +1,5 @@
 {
   "#thingtype": "signal",
-  "name": "_:Base:Point2D",
-  "society": [],
   "element": [
     {
       "name": "x",
@@ -11,5 +9,8 @@
       "name": "y",
       "type": "float64"
     }
+  ],
+  "name": "_:Base:Point2D",
+  "society": [
   ]
 }

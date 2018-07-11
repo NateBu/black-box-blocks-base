@@ -1,8 +1,11 @@
 {
   "#thingtype": "dockerimage",
+  "from": [
+  ],
   "name": "_:Base:gdb",
-  "society": [],
-  "from": [],
-  "pathmap": [],
+  "pathmap": [
+  ],
+  "society": [
+  ],
   "text": "RUN apt-get install -y texinfo wget libreadline-dev\nRUN wget http://ftp.gnu.org/gnu/gdb/gdb-8.1.tar.xz\nRUN tar -xf gdb-8.1.tar.xz\nWORKDIR gdb-8.1/\nRUN ./configure --prefix=/usr/local --with-python=/usr/bin/python3 --with-system-readline --without-guile && make -j8\nRUN make -C gdb install\nRUN cd .. && rm -r gdb-8.1 && rm -r gdb-8.1.tar.xz"
 }

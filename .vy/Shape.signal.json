@@ -1,7 +1,5 @@
 {
   "#thingtype": "signal",
-  "name": "_:Base:Shape",
-  "society": [],
   "element": [
     {
       "name": "id",
@@ -12,14 +10,17 @@
       "type": "string"
     },
     {
-      "name": "attributes",
       "length": 0,
+      "name": "attributes",
       "type": "signal::_:Base:KeyValue"
     },
     {
-      "name": "vertices",
       "length": 0,
+      "name": "vertices",
       "type": "signal::_:Base:Point2D"
     }
+  ],
+  "name": "_:Base:Shape",
+  "society": [
   ]
 }

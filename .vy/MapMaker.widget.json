@@ -1,25 +1,25 @@
 {
   "#thingtype": "widget",
-  "name": "_:Base:MapMaker",
-  "society": [],
   "calibration": [
     {
-      "name": "MapRequest",
       "defaultvalue": "mapreq",
+      "name": "MapRequest",
       "type": "String"
     },
     {
-      "name": "MapResponse",
       "defaultvalue": "mapresp",
+      "name": "MapResponse",
       "type": "String"
     },
     {
-      "name": "map",
+      "defaultsource": "file::_:Base:/data/example_map_1.json",
       "hidden": true,
-      "type": "signal::_:Base:Mapx",
-      "defaultsource": "file::_:Base:/data/example_map_1.json"
+      "name": "map",
+      "type": "signal::_:Base:Mapx"
     }
   ],
+  "collection": {
+  },
   "file": [
     {
       "name": "polygon_area",
@@ -30,22 +30,26 @@
       "type": "file::_:Base:/ui/MapMaker.js"
     }
   ],
+  "name": "_:Base:MapMaker",
+  "pathmap": [
+  ],
   "signal": [
     {
-      "name": ":::MapRequest:::",
       "action": "Subscribe",
       "jsmethod": "map_request",
+      "name": ":::MapRequest:::",
       "type": "signal::_:Base:Mapx"
     },
     {
-      "name": ":::MapResponse:::",
       "action": "Publish",
       "jsmethod": "map_response",
+      "name": ":::MapResponse:::",
       "type": "signal::_:Base:Mapx"
     }
   ],
-  "widget": [],
-  "pathmap": [],
+  "society": [
+  ],
   "summary": "-",
-  "collection": {}
+  "widget": [
+  ]
 }
