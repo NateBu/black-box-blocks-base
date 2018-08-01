@@ -18,9 +18,10 @@
       "type": "signal::_:Base:Mapx"
     }
   ],
-  "collection": {
-  },
-  "file": [
+  "collection": {},
+  "name": "_:Base:MapMaker",
+  "pathmap": [],
+  "share": [
     {
       "name": "polygon_area",
       "type": "file::_:Base:/ui/polygon_area.js"
@@ -29,9 +30,6 @@
       "name": "--",
       "type": "file::_:Base:/ui/MapMaker.js"
     }
-  ],
-  "name": "_:Base:MapMaker",
-  "pathmap": [
   ],
   "signal": [
     {
@@ -47,9 +45,7 @@
       "type": "signal::_:Base:Mapx"
     }
   ],
-  "society": [
-  ],
+  "society": [],
   "summary": "-",
-  "widget": [
-  ]
+  "widget": []
 }

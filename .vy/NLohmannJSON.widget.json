@@ -5,24 +5,18 @@
       "command": "bash ./build.sh && rm build.sh"
     }
   ],
-  "calibration": [
-  ],
-  "collection": {
-  },
-  "file": [
+  "calibration": [],
+  "collection": {},
+  "name": "_:Base:NLohmannJSON",
+  "pathmap": [],
+  "share": [
     {
       "name": "build.sh",
       "type": "file::_:Base:/tools/nlohmann_json.sh"
     }
   ],
-  "name": "_:Base:NLohmannJSON",
-  "pathmap": [
-  ],
-  "signal": [
-  ],
-  "society": [
-  ],
+  "signal": [],
+  "society": [],
   "summary": "-",
-  "widget": [
-  ]
+  "widget": []
 }

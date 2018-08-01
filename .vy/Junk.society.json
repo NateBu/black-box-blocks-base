@@ -1,10 +1,7 @@
 {
-  "#invitees": [
-  ],
-  "#requests": [
-  ],
+  "#invitees": [],
+  "#requests": [],
   "#thingtype": "society",
   "name": "_:Base:Junk",
-  "society": [
-  ]
+  "society": []
 }

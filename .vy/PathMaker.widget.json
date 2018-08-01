@@ -18,22 +18,17 @@
       "type": "signal::_:Base:PathList"
     }
   ],
-  "collection": {
-  },
-  "file": [
+  "collection": {},
+  "name": "_:Base:PathMaker",
+  "pathmap": [],
+  "share": [
     {
       "name": "--",
       "type": "file::_:Base:/ui/PathMaker.js"
     }
   ],
-  "name": "_:Base:PathMaker",
-  "pathmap": [
-  ],
-  "signal": [
-  ],
-  "society": [
-  ],
+  "signal": [],
+  "society": [],
   "summary": "-",
-  "widget": [
-  ]
+  "widget": []
 }

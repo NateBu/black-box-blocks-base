@@ -1,23 +1,17 @@
 {
   "#thingtype": "widget",
-  "calibration": [
-  ],
-  "collection": {
-  },
-  "file": [
+  "calibration": [],
+  "collection": {},
+  "name": "_:Base:Ros2ardent",
+  "pathmap": [],
+  "share": [
     {
       "name": "build.sh",
       "type": "file::_:Base:/tools/ros2.sh"
     }
   ],
-  "name": "_:Base:Ros2ardent",
-  "pathmap": [
-  ],
-  "signal": [
-  ],
-  "society": [
-  ],
+  "signal": [],
+  "society": [],
   "summary": "-",
-  "widget": [
-  ]
+  "widget": []
 }
