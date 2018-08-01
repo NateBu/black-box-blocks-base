@@ -1,5 +1,5 @@
 {
-  "#thingtype": "dockerimage",
+  "#thingtype": "stage",
   "from": [
   ],
   "name": "_:Base:gdb",
