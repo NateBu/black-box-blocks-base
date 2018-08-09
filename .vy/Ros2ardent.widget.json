@@ -3,7 +3,6 @@
   "calibration": [],
   "collection": {},
   "name": "_:Base:Ros2ardent",
-  "pathmap": [],
   "share": [
     {
       "name": "build.sh",
