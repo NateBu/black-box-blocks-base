@@ -1,7 +1,7 @@
 '''
 TODO: USe this for all STL https://gist.github.com/skyscribe/3978082
 gdb --batch-silent -x thing_gdb_commands.py --args executablename arg1 arg2 arg3
-//GDB {"action":"variable_message","variable":"dividers","topic":"VineyardRowGenerator::generateRows::dividers"}
+//vygdb {"action":"variable_message","variable":"dividers","topic":"VineyardRowGenerator::generateRows::dividers"}
 https://gcc.gnu.org/ml/libstdc++/2009-02/msg00056.html
 
 print([gdb.TYPE_CODE_PTR,  gdb.TYPE_CODE_ARRAY,     gdb.TYPE_CODE_STRUCT,  gdb.TYPE_CODE_UNION,
@@ -64,7 +64,7 @@ def _vector(variable):
     try:
       x.append(something_to_json( it.next() ))
     except Exception as exc:
-      print('something_to_json exception:',exc)
+      print('vygdb._vector exception:',exc)
       break
     count += 1
   return x
@@ -119,12 +119,16 @@ def something_to_json(variable):
       x = something_to_json(variable.referenced_value())
     elif typ.code in [gdb.TYPE_CODE_PTR]:
       x = something_to_json(variable.dereference())
-    elif vtype.find("std::vector") == 0:
+    elif vtype.find("const std::vector") == 0 or vtype.find("std::vector") == 0:
       x = _vector(variable)
-    elif vtype.find("std::tuple") == 0:
+    elif vtype.find("const std::tuple") == 0 or vtype.find("std::tuple") == 0:
       x = _tuple(variable)
-    elif vtype.find("std::function") == 0:
+    elif vtype.find("const std::function") == 0 or vtype.find("std::function") == 0:
       x = None
+    elif vtype.find("const std::map") == 0 or vtype.find("std::map") == 0:
+      x = _map(variable)
+    elif vtype.find("const std::allocator") == 0 or vtype.find("std::allocator") == 0:
+      x = _map(variable)
     elif typ.code == gdb.TYPE_CODE_FLT:
       x = float(variable)
       if math.isnan(x):
@@ -138,8 +142,30 @@ def something_to_json(variable):
     else:
       x = _struct(variable)
   except Exception as exc:
-    print('Exception',exc,vtype,typ.code,variable)
+    print('vygdb.something_to_json Exception = ',exc)
+    print('vtype = ',vtype)
+    print('typ.code = ',typ.code)
+    print('variable = ',variable)
   return x
+
+def jsonify(variableinternal):
+  top = gdb.newest_frame()
+  vcount = 0
+  try:
+    for variableparts in re.split('\.|->',variableinternal):
+      variable = top.read_var(variableparts) if vcount == 0 else variable[variableparts]
+      vcount += 1
+  except Exception as exc:
+    print('vygdb.jsonify error: ',exc)
+  else:    
+    if variable.is_optimized_out:
+      print('vygdb.jsonify error: ' + variableinternal + ' is optimized out at ' + self.source)
+    else:
+      try:
+        return something_to_json(variable)
+      except Exception as exc:
+        print('vygdb.jsonify error: Could not access variable ' + variableinternal + ' at ' + self.source + '\n', exc)
+  return None
 
 class custom_breakpoint(gdb.Breakpoint):
   def __init__(self, source, action):
@@ -151,21 +177,10 @@ class custom_breakpoint(gdb.Breakpoint):
     self.action = action
 
   def stop(self):
-    top = gdb.newest_frame()
     msg = {}
     for variablemap in self.variables:
       variableinternal = self.variables[variablemap]
-      vcount = 0
-      for variableparts in variableinternal.split('.'): # TODO expand for mixed -> and .
-        variable = top.read_var(variableparts) if vcount == 0 else variable[variableparts]
-        vcount += 1
-      if variable.is_optimized_out:
-        print('*custom_breakpoint error: ' + variableinternal + ' is optimized out at ' + self.source)
-      else:
-        try:
-          msg[variablemap] = something_to_json(variable)
-        except Exception as exc:
-          print('*custom_breakpoint error: Could not access variable ' + variableinternal + ' at ' + self.source + '\n', exc)
+      msg[variablemap] = jsonify(variableinternal)
   
     stop_ = False
     if msg and self.topic is None: # No topic just print
@@ -176,7 +191,7 @@ class custom_breakpoint(gdb.Breakpoint):
       try:
         stop_ = GDB_METHODS[self.method](msg, user_command)
       except Exception as exc:
-        print('*custom_breakpoint error: Problem running method ' + str(self.method) + ' at ' + self.source + '\n', exc)
+        print('vygdb.custom_breakpoint error: Problem running method ' + str(self.method) + ' at ' + self.source + '\n', exc)
 
     if msg and self.topic is not None:
       data = {}
@@ -205,7 +220,7 @@ def __action_assignment__(actionlist, filterlist=[], default_active=True, exclus
       elif 'breakpoint' not in action and make_active:
         action['breakpoint'] = custom_breakpoint(action['source'],action)
     else:
-      print('GDB Action:',action,'must have "source" ["variables", "topic", "labels", and "method" are optional fields]')
+      print('vygdb Action:',action,'must have "source" ["variables", "topic", "labels", and "method" are optional fields]')
 
   ACTION_LIST = actionlist
   for action in ACTION_LIST:
@@ -254,14 +269,17 @@ def parse_sources(replace_paths=[]):
                     raise ParseSourceException("Duplicate source breakpoint")
                 actionlist.append(cmd)
               except Exception as exc:
-                print('  -thing_debug: Could not process potential debug point in '+filename+' at line '+str(i)+':\n'+line,exc)
+                print('  vygdb.parse_sources: Could not process potential debug point in '+filename+' at line '+str(i)+':\n'+line,exc)
       except Exception as exc:
-        print('  -thing_debug: collection warning, failed reading of '+filename+':',exc)
+        print('  vygdb.parse_sources: collection warning, failed reading of '+filename+':',exc)
   return actionlist
 
 def get_command():
   cmd = user_command.get()
-  if cmd.startswith('activate '):
+  if cmd.startswith('vyp '):
+    print(jsonify(cmd[4:]))
+    cmd = None
+  elif cmd.startswith('activate '):
     lst = cmd.strip().split()[1:]
     activate(ACTION_LIST, lst, False)
     cmd = None
@@ -301,7 +319,7 @@ def run():
         lastcmd = cmd
         gdb.execute( cmd )
       except Exception as exc:
-        print('Problem executing ',cmd,exc)
+        print('vygdb.run problem executing ',cmd,exc)
 
 if __name__ == 'main':
   actionlist = init()

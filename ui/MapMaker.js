@@ -1,7 +1,7 @@
 output = {
   constructor:function() {
     this.radius = 6;
-    this.color = {'obstacle':'#c83232','drivable':'#3264c8'};
+    this.color = {'obstacle':'#c83232','drivable':'#3264c8','reference':'green'};
     this.dragging = false;
     this.editing = -1;
     this.movingpolygon = false;
@@ -26,6 +26,9 @@ output = {
     if (this.g) this.draw();
     if (context.calibration.map && context.calibration.map.hasOwnProperty('shapes') ) {
       this.polygons = context.calibration.map.shapes;
+      if (this.polygons.length > 0 && this.polygons[0].hasOwnProperty('vertices') && this.polygons[0].vertices.length > 0) {
+        console.log('First vertex:',this.polygons[0].vertices[0])
+      }
     }
     this.context = context;
     if (this.g) this.draw();
@@ -57,7 +60,7 @@ output = {
   },
   
   polygonColor:function(poly) {
-    return this.color.hasOwnProperty(poly.type) ? this.color[poly.type] : 'white';
+    return this.color.hasOwnProperty(poly.type) ? this.color[poly.type] : 'gold';
   },
   
   drawpoly:function(idx) {
@@ -65,6 +68,7 @@ output = {
     if (idx >= this.polygons.length || idx < 0)
       return;
     var poly = this.polygons[idx]
+
     var color = this.polygonColor(poly);
     this.g.selectAll('g.shape_id'+poly.id).remove();
     var g = this.g.append('g')
