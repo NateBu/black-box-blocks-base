@@ -233,7 +233,7 @@ def parse_sources(replace_paths=[]):
   sourcefiles = {'.py':{'comment':'\#'},
                   '.c':{'comment':'\/\/'}, '.cpp':{'comment':'\/\/'},
                   '.h':{'comment':'\/\/'}, '.hpp':{'comment':'\/\/'}}
-  trigger = 'GDB'
+  trigger = 'vygdb'
   optionalspaces = '\s*?'
   actionlist = []
   sources = gdb.execute("info sources",to_string=True)
