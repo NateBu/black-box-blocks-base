@@ -13,24 +13,15 @@ print([gdb.TYPE_CODE_PTR,  gdb.TYPE_CODE_ARRAY,     gdb.TYPE_CODE_STRUCT,  gdb.T
   gdb.TYPE_CODE_DECFLOAT,  gdb.TYPE_CODE_INTERNAL_FUNCTION])
 
 '''
-
-import gdb, time, re, json, math
+import gdb, time, re, json, math, sys, subprocess, os
+from multiprocessing.connection import Client
 from multiprocessing import Queue
-global GDB_METHODS, ACTION_LIST
+import threading
+global GDB_METHODS, ACTION_LIST, SOCK
+SOCK = None
 GDB_METHODS = {}
 ACTION_LIST = []
 user_command = Queue()
-from DDPClient import DDPClient
-logclient = DDPClient("ws://127.0.0.1:3000/websocket", auto_reconnect=True, auto_reconnect_timeout=1)
-logclient.connect()
-
-def ondebugstream(collection, id, fields, cleared):
-  f = fields["args"][0]
-  if "fromui" in f and f["fromui"] and "message" in f:
-    user_command.put( f["message"] )
-
-time.sleep(2)
-logclient.on("changed", ondebugstream)
 
 class ParseSourceException(Exception):
     pass
@@ -174,22 +165,22 @@ class custom_breakpoint(gdb.Breakpoint):
     self.variables = action['variables'] if 'variables' in action else []
     self.topic = action['topic'] if 'topic' in action else None
     self.method = action['method'] if 'method' in action else None
+    self.breakstop = action['stop'] if 'stop' in action else False
     self.action = action
 
   def stop(self):
     msg = {}
     for variablemap in self.variables:
-      variableinternal = self.variables[variablemap]
-      msg[variablemap] = jsonify(variableinternal)
+      msg[variablemap] = jsonify(self.variables[variablemap])
   
-    stop_ = False
+    stop_ = self.breakstop
     if msg and self.topic is None: # No topic just print
       for x in msg:
         print(x+':',msg[x])
 
     if self.method is not None and self.method in GDB_METHODS:
       try:
-        stop_ = GDB_METHODS[self.method](msg, user_command)
+        stop_ |= GDB_METHODS[self.method](msg, user_command)
       except Exception as exc:
         print('vygdb.custom_breakpoint error: Problem running method ' + str(self.method) + ' at ' + self.source + '\n', exc)
 
@@ -198,7 +189,7 @@ class custom_breakpoint(gdb.Breakpoint):
       for x in self.action:
         if x is not 'breakpoint':
           data[x] = msg if x == 'variables' else self.action[x]
-      logclient.call("stream-topicstream", ["debugstream__",{'fromui':False,'message':data}])
+      SOCK.send({'vygdb_data':data})
     return stop_
 
 def exit_handler (event):
@@ -278,6 +269,7 @@ def get_command():
   cmd = user_command.get()
   if cmd.startswith('vyp '):
     print(jsonify(cmd[4:]))
+    sys.stdout.flush()
     cmd = None
   elif cmd.startswith('activate '):
     lst = cmd.strip().split()[1:]
@@ -292,36 +284,47 @@ def get_command():
 def stop(msg, user_command):
   return True
 
-def init(replace_paths=[], methods={}):
-  global GDB_METHODS
-  GDB_METHODS = methods
-  if 'stop' not in methods:
+if __name__ == '__main__':
+  replace_paths = []
+  if 'stop' not in GDB_METHODS:
     GDB_METHODS['stop'] = stop
 
-  # Second argument is a boolean but Im not sure what it means
-  sub_id = logclient.subscribe("stream-topicstream", ["debugstream__",True])
   gdb.events.exited.connect(exit_handler)
-
   #gdb.execute("start") # Ensure shared libraries are loaded already (TODO, fix this? try-catch?)
   gdb.execute("set pagination off")
   gdb.execute("set python print-stack full")
   gdb.execute("set confirm off")
-  return parse_sources(replace_paths)
-  
-def run():
-  gdb.execute("run")
-  lastcmd = None
-  while True:
-    cmd = get_command()
-    if cmd is not None:
-      try:
-        cmd = lastcmd if len(cmd)==0 and lastcmd is not None else cmd
-        lastcmd = cmd
-        gdb.execute( cmd )
-      except Exception as exc:
-        print('vygdb.run problem executing ',cmd,exc)
+  actionlist = parse_sources(replace_paths)
 
-if __name__ == 'main':
-  actionlist = init()
-  action_assignment(actionlist)
-  run()
+  def cmd_listener():
+    while True:
+      data = SOCK.recv()
+      if data and 'vygdb' in data:
+        user_command.put( data['vygdb'] )   
+
+  host = 'docker.host.internal'
+  # Since docker.host.internal is broken on linux (https://github.com/docker/for-linux/issues/264)
+  host = subprocess.check_output("/sbin/ip route|awk '/default/ { print $3 }'",shell=True).decode('ascii').strip()
+  port = int(os.environ['VYCMDPORT'])
+  with Client((host, port)) as SOCK:
+    SOCK.send({'vygdb_getactions':actionlist,'projectname':os.environ['VYPROJECTNAME'],'projecttype':os.environ['VYPROJECTTYPE']})
+    data = SOCK.recv()
+    actionlist += data
+    activate(actionlist,[],True)
+    gdb.execute("run")
+    t = threading.Thread(target=cmd_listener)
+    t.daemon = True
+    t.start()
+    lastcmd = None
+    while True:
+      cmd = get_command()
+      if cmd is not None:
+        try:
+          cmd = lastcmd if len(cmd)==0 and lastcmd is not None else cmd
+          lastcmd = cmd
+          gdb.execute( cmd )
+        except Exception as exc:
+          print('vygdb problem executing ',cmd,exc)
+
+
+  
