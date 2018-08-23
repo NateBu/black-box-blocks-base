@@ -323,18 +323,16 @@ def latest_position(sock, lastfile):
   currentfile = None
   try:
     # I'm sure there's a better way of getting linenumber and file from gdb class but I can't figure it out
-    line = gdb.execute('info line',to_string=True).split('" starts at address')
-    if len(line) == 2:
-      linex = line[0].split('"')
-      linenumber = int(linex[0].replace(' of ','').replace('Line ',''))
-      currentfile = linex[1]
+    x = gdb.newest_frame().find_sal()
+    if x.is_valid() and x.symtab.is_valid():
+      currentfile = x.symtab.filename
       if currentfile is not lastfile:
         with open(currentfile,'r') as cf:
-          sock.send({'vygdb_current':{'line':linenumber,'filename':currentfile,'file':cf.read(),'job':os.environ['VYJOB']}})
+          sock.send({'vygdb_current':{'line':x.line,'filename':currentfile,'file':cf.read(),'job':os.environ['VYJOB']}})
       else:
-        sock.send({'vygdb_current':{'line':linenumber,'job':os.environ['VYJOB']}})
+        sock.send({'vygdb_current':{'line':x.line,'job':os.environ['VYJOB']}})
   except Exception as exc:
-    print('vygdb latest_position error:',exc,line)
+    print('vygdb latest_position error:',exc)
     sys.stdout.flush()
   return currentfile
 
@@ -378,7 +376,7 @@ if __name__ == '__main__':
       if cmd is not None:
         try:
           cmd = lastcmd if len(cmd)==0 and lastcmd is not None else cmd
-          gdb.execute( cmd )
+          gdb.execute( cmd ) #eval(cmd)
           sys.stdout.flush()
           lastcmd = cmd
           lastfile = latest_position(SOCK, lastfile)
