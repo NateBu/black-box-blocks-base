@@ -17,31 +17,13 @@ import gdb, time, re, json, math, sys, subprocess, os
 from multiprocessing.connection import Client
 from multiprocessing import Queue
 import threading
-global GDB_METHODS, ACTION_LIST, SOCK, MARSHALS
+global SOCK, VYGDB
 SOCK = None
-GDB_METHODS = {}
-MARSHALS = {}
-ACTION_LIST = []
+VYGDB = {'METHODS':{},'MARSHALS':{},'BREAKPOINTS':[]}
 user_command = Queue()
 
 class ParseSourceException(Exception):
     pass
-
-import numpy as np
-from PIL import Image
-import base64, time
-from io import BytesIO
-def to_png(msg, user_queue):
-  w = msg['grid']['info']['width_cells']
-  h = msg['grid']['info']['height_cells'] 
-  x = np.resize(255-np.array(msg['grid']['data']),(w,h))
-  x = np.flipud(x)
-  pillow_image = Image.fromarray(x.astype(np.uint8), mode='L')
-  buffered = BytesIO()
-  pillow_image.save(buffered, format="PNG")
-  msg['grid']['data'] = base64.b64encode(buffered.getvalue()).decode('ascii')
-GDB_METHODS['occupancy_png'] = to_png
-
 
 class _iterator:
   def __init__ (self, start, finish):
@@ -148,8 +130,8 @@ def marshal(variable):
       x = bool(variable)
     elif typ.code in [gdb.TYPE_CODE_ENUM]:
       x = '"'+str(variable)+'"' # enums return as string not value
-    elif vtype in MARSHALS:
-      x = eval(MARSHALS[vtype], {'x':variable,'marshal':marshal}, {})
+    elif vtype in VYGDB['MARSHALS']:
+      x = VYGDB['MARSHALS'][vtype](variable,marshal)
     else:
       x = _struct(variable)
   except Exception as exc:
@@ -207,9 +189,9 @@ class custom_breakpoint(gdb.Breakpoint):
         print(x+':',msg[x])
       sys.stdout.flush()
 
-    if self.method is not None and self.method in GDB_METHODS:
+    if self.method is not None and self.method in VYGDB['METHODS']:
       try:
-        stop_ |= GDB_METHODS[self.method](msg, user_command)
+        stop_ |= VYGDB['METHODS'][self.method](msg, user_command)
       except Exception as exc:
         print('vygdb.custom_breakpoint error: Problem running method ' + str(self.method) + ' at ' + self.source + '\n', exc)
         sys.stdout.flush()
@@ -225,14 +207,14 @@ class custom_breakpoint(gdb.Breakpoint):
 def exit_handler (event):
   gdb.execute("quit")
 
-def activate(actionlist, filterlist=[], exclusive=False):
-  __action_assignment__(actionlist, filterlist, True, exclusive)
+def activate(filterlist=[], exclusive=False):
+  __action_assignment__(filterlist, True, exclusive)
 
-def deactivate(actionlist, filterlist=[], exclusive=False):
-  __action_assignment__(actionlist, filterlist, False, exclusive)
+def deactivate(filterlist=[], exclusive=False):
+  __action_assignment__(filterlist, False, exclusive)
 
-def __action_assignment__(actionlist, filterlist=[], default_active=True, exclusive=True):
-  global ACTION_LIST
+def __action_assignment__(filterlist=[], default_active=True, exclusive=True):
+  global VYGDB
   def _addaction_(action, make_active):
     if 'source' in action:
       if 'breakpoint' in action and not make_active:
@@ -244,64 +226,67 @@ def __action_assignment__(actionlist, filterlist=[], default_active=True, exclus
       print('vygdb Action:',action,'must have "source" ["variables", "topic", "labels", and "method" are optional fields]')
       sys.stdout.flush()
 
-  ACTION_LIST = actionlist
-  for action in ACTION_LIST:
+  for action in VYGDB['BREAKPOINTS']:
     match = ('labels' in action and (not set(action['labels']).isdisjoint(filterlist)))
     match = match if not exclusive else not match
     if match:
       _addaction_(action, default_active)
 
+def marshals_and_methods(textlist):
+  global VYGDB
+  for text in textlist:
+    tempvygdb = {'MARSHALS':{},'METHODS':{}}
+    exec(text, {}, tempvygdb)
+    for typ in ['MARSHALS','METHODS']:
+      for x in tempvygdb[typ]:
+        print('Adding ',typ,x)
+        if x in VYGDB[typ]:
+          raise ParseSourceException("Duplicate "+typ+" definition of "+typ+'"')
+        VYGDB[typ][x] = tempvygdb[typ][x]
+
 def parse_sources(replace_paths=[]):
-  sourcefiles = {'.py':{'comment':'\#'},
-                  '.c':{'comment':'\/\/'}, '.cpp':{'comment':'\/\/'},
-                  '.h':{'comment':'\/\/'}, '.hpp':{'comment':'\/\/'}}
-  trigger = 'vygdb'
-  optionalspaces = '\s*?'
-  vygdbsource = {'actionlist':[],'marshal':{}}
+  global VYGDB
   sources = gdb.execute("info sources",to_string=True)
   pattern1 = 'Source files for which symbols have been read in:'
   pattern2 = 'Source files for which symbols will be read in on demand:'
   p1s = sources.find(pattern1)
   p2s = sources.find(pattern2)
+  vyscripts = []
   if p1s >= 0 and p2s >=0 :
     symbols = sources[p1s+len(pattern1):p2s].strip().split(', ') + sources[p2s+len(pattern2):].strip().split(', ')
     for filename in symbols:
       for rpath in replace_paths:
         filename = filename.replace(rpath['old'],rpath['new'])
-      comment = None
-      for ext in sourcefiles:
-        if filename.endswith(ext):
-          comment = sourcefiles[ext]['comment']
-          break
-      if comment is None:
-        continue
 
-      pattern = re.compile('^'+optionalspaces+comment+optionalspaces+trigger)
+      delimiter = re.compile('(?s)<vygdb(.*?)vygdb>')
       try:
         with open(filename, 'r') as file:
+          vyscripts += delimiter.findall(file.read())
+
+        with open(filename, 'r') as file:
           for (i, line) in enumerate(file):
-            mtch = re.match(pattern,line)
-            if mtch:
+            for mtch in delimiter.findall(line):
               try:
-                cmd = json.loads(re.sub(pattern,'',line.strip()))
-                if 'marshal' in cmd:
-                  for x in cmd['marshal']:
-                    if x in vygdbsource['marshal']:
-                      raise ParseSourceException("Duplicate marshal instruction (in "+filename+':'+str(i+1)+"):"+str(cmd))
-                    vygdbsource['marshal'][x] = cmd['marshal'][x]
-                else:
-                  cmd['source'] = filename.split('/')[-1]+':'+str(i+1)
-                  for c in vygdbsource['actionlist']:
-                    if cmd['source']==c['source']:
-                      raise ParseSourceException("Duplicate source breakpoint")
-                  vygdbsource['actionlist'].append(cmd)
+                cmd = json.loads(mtch)
+                cmd['source'] = filename.split('/')[-1]+':'+str(i+1)
+                for c in VYGDB['BREAKPOINTS']:
+                  if cmd['source']==c['source']:
+                    raise ParseSourceException("Duplicate source breakpoint")
+                VYGDB['BREAKPOINTS'].append(cmd)
               except Exception as exc:
                 print('  vygdb.parse_sources: Could not process potential debug point in '+filename+' at line '+str(i)+':\n'+line,exc)
                 sys.stdout.flush()
       except Exception as exc:
         print('  vygdb.parse_sources: collection warning, failed reading of '+filename+':',exc)
         sys.stdout.flush()
-  return vygdbsource
+  
+  vyscripts_filter_breakpoints = []
+  for x in vyscripts:
+    try:
+      json.loads(x)
+    except:
+      vyscripts_filter_breakpoints.append(x)
+  return vyscripts_filter_breakpoints
 
 def get_command():
   cmd = user_command.get()
@@ -311,11 +296,11 @@ def get_command():
     cmd = None
   elif cmd.startswith('activate '):
     lst = cmd.strip().split()[1:]
-    activate(ACTION_LIST, lst, False)
+    activate(lst, False)
     cmd = None
   elif cmd.startswith('deactivate '):
     lst = cmd.strip().split()[1:]
-    deactivate(ACTION_LIST, lst, False)
+    deactivate(lst, False)
     cmd = None
   return cmd
 
@@ -341,16 +326,13 @@ def stop(msg, user_command):
 
 if __name__ == '__main__':
   replace_paths = []
-  if 'stop' not in GDB_METHODS:
-    GDB_METHODS['stop'] = stop
 
   gdb.events.exited.connect(exit_handler)
   #gdb.execute("start") # Ensure shared libraries are loaded already (TODO, fix this? try-catch?)
   gdb.execute("set pagination off")
   gdb.execute("set python print-stack full")
   gdb.execute("set confirm off")
-  vygdbsource = parse_sources(replace_paths)
-  MARSHALS = vygdbsource['marshal']
+  vyscripts = parse_sources(replace_paths)
 
   def cmd_listener():
     while True:
@@ -363,10 +345,14 @@ if __name__ == '__main__':
   host = subprocess.check_output("/sbin/ip route|awk '/default/ { print $3 }'",shell=True).decode('ascii').strip()
   port = int(os.environ['VYCMDPORT'])
   with Client((host, port)) as SOCK:
-    SOCK.send({'vygdb_getactions':vygdbsource['actionlist'],'projectname':os.environ['VYPROJECTNAME'],'projecttype':os.environ['VYPROJECTTYPE']})
+    SOCK.send({'vygdb_getactions':VYGDB,'projectname':os.environ['VYPROJECTNAME'],'projecttype':os.environ['VYPROJECTTYPE']})
     data = SOCK.recv()
-    vygdbsource['actionlist'] += data
-    activate(vygdbsource['actionlist'],[],True)
+    VYGDB['BREAKPOINTS'] = data['BREAKPOINTS']
+    if 'SCRIPTS' in data:
+      vyscripts += data['SCRIPTS']
+    marshals_and_methods(vyscripts)
+
+    activate(["intersectionscpp"],True)
     threading.Thread(target=cmd_listener, daemon=True).start()
     gdb.execute("run")
     lastcmd = None
