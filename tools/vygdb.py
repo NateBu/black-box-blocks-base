@@ -184,7 +184,7 @@ class custom_breakpoint(gdb.Breakpoint):
       msg[variablemap] = jsonify(self.variables[variablemap])
   
     stop_ = self.breakstop
-    if msg and self.topic is None: # No topic just print
+    if msg and self.topic is None and self.method is None: # No topic or method just print
       for x in msg:
         print(x+':',msg[x])
       sys.stdout.flush()
@@ -345,14 +345,16 @@ if __name__ == '__main__':
   host = subprocess.check_output("/sbin/ip route|awk '/default/ { print $3 }'",shell=True).decode('ascii').strip()
   port = int(os.environ['VYCMDPORT'])
   with Client((host, port)) as SOCK:
-    SOCK.send({'vygdb_getactions':VYGDB,'projectname':os.environ['VYPROJECTNAME'],'projecttype':os.environ['VYPROJECTTYPE']})
+    SOCK.send({'vygdb_getactions':None,'projectname':os.environ['VYPROJECTNAME'],'projecttype':os.environ['VYPROJECTTYPE']})
     data = SOCK.recv()
-    VYGDB['BREAKPOINTS'] = data['BREAKPOINTS']
+    print('data',data)
+    if 'BREAKPOINTS' in data:
+      VYGDB['BREAKPOINTS'] += data['BREAKPOINTS']
     if 'SCRIPTS' in data:
       vyscripts += data['SCRIPTS']
     marshals_and_methods(vyscripts)
 
-    activate(["intersectionscpp"],True)
+    activate([],True)
     threading.Thread(target=cmd_listener, daemon=True).start()
     gdb.execute("run")
     lastcmd = None
