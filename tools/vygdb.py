@@ -110,6 +110,8 @@ def marshal(variable):
       x = marshal(variable.referenced_value())
     elif typ.code in [gdb.TYPE_CODE_PTR]:
       x = marshal(variable.dereference())
+    elif typ.code == gdb.TYPE_CODE_VOID:
+      x = None
     elif vtype.find("const std::vector") == 0 or vtype.find("std::vector") == 0:
       x = _vector(variable)
     elif vtype.find("const std::tuple") == 0 or vtype.find("std::tuple") == 0:
@@ -142,30 +144,12 @@ def marshal(variable):
     sys.stdout.flush()
   return x
 
-def jsonify(variableinternal):
-  top = gdb.newest_frame()
-  vcount = 0
+def jsonify(variable):  
   try:
-    for variableparts in re.split('\.|->',variableinternal):
-      variableparts = variableparts.split('[')
-      for vp in variableparts:
-        vp_ = int(vp.strip(']')) if vp.endswith(']') else vp
-        variable = top.read_var(vp) if vcount == 0 else variable[vp_]
-        vcount += 1
-
+    return marshal(gdb.parse_and_eval(variable))
   except Exception as exc:
-    print('vygdb.jsonify error: ',exc)
+    print('vygdb.jsonify error: Could not access variable ' + variable + ' at ' + self.source + '\n', exc)
     sys.stdout.flush()
-  else:    
-    if variable.is_optimized_out:
-      print('vygdb.jsonify error: ' + variableinternal + ' is optimized out at ' + self.source)
-      sys.stdout.flush()
-    else:
-      try:
-        return marshal(variable)
-      except Exception as exc:
-        print('vygdb.jsonify error: Could not access variable ' + variableinternal + ' at ' + self.source + '\n', exc)
-        sys.stdout.flush()
   return None
 
 class custom_breakpoint(gdb.Breakpoint):
@@ -191,17 +175,24 @@ class custom_breakpoint(gdb.Breakpoint):
 
     if self.method is not None and self.method in VYGDB['METHODS']:
       try:
-        stop_ |= VYGDB['METHODS'][self.method](msg, user_command)
+        stop_ |= VYGDB['METHODS'][self.method](msg, {'queue':user_command, 'gdb':gdb, 'marshal':marshal})
       except Exception as exc:
         print('vygdb.custom_breakpoint error: Problem running method ' + str(self.method) + ' at ' + self.source + '\n', exc)
         sys.stdout.flush()
+        return True
 
     if msg and self.topic is not None:
       data = {}
       for x in self.action:
         if x is not 'breakpoint':
           data[x] = msg if x == 'variables' else self.action[x]
-      SOCK.send({'vygdb_data':data})
+      try:
+        SOCK.send({'vygdb_data':data})
+      except Exception as exc:
+        print('Failed to send vygdb_data',data)
+        print(exc)
+        sys.stdout.flush()
+        return True
     return stop_
 
 def exit_handler (event):
@@ -290,8 +281,15 @@ def parse_sources(replace_paths=[]):
 
 def get_command():
   cmd = user_command.get()
-  if cmd.startswith('vyp '):
-    print(jsonify(cmd[4:]))
+  if cmd.startswith('vy c '):
+    try:
+      print(marshal(gdb.parse_and_eval(cmd[5:])))
+    except Exception as exc:
+      print(exc)
+    sys.stdout.flush()
+    cmd = None
+  elif cmd.startswith('vy p '):
+    print(jsonify(cmd[5:]))
     sys.stdout.flush()
     cmd = None
   elif cmd.startswith('activate '):
@@ -309,7 +307,7 @@ def latest_position(sock, lastfile):
   try:
     # I'm sure there's a better way of getting linenumber and file from gdb class but I can't figure it out
     x = gdb.newest_frame().find_sal()
-    if x.is_valid() and x.symtab.is_valid():
+    if x is not None and x.is_valid() and x.symtab.is_valid():
       currentfile = x.symtab.filename
       if currentfile is not lastfile:
         with open(currentfile,'r') as cf:
@@ -347,14 +345,13 @@ if __name__ == '__main__':
   with Client((host, port)) as SOCK:
     SOCK.send({'vygdb_getactions':None,'projectname':os.environ['VYPROJECTNAME'],'projecttype':os.environ['VYPROJECTTYPE']})
     data = SOCK.recv()
-    print('data',data)
     if 'BREAKPOINTS' in data:
       VYGDB['BREAKPOINTS'] += data['BREAKPOINTS']
     if 'SCRIPTS' in data:
       vyscripts += data['SCRIPTS']
     marshals_and_methods(vyscripts)
 
-    activate([],True)
+    activate(["proximityc"],True)
     threading.Thread(target=cmd_listener, daemon=True).start()
     gdb.execute("run")
     lastcmd = None
