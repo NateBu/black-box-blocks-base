@@ -144,14 +144,6 @@ def marshal(variable):
     sys.stdout.flush()
   return x
 
-def jsonify(variable):  
-  try:
-    return marshal(gdb.parse_and_eval(variable))
-  except Exception as exc:
-    print('vygdb.jsonify error: Could not access variable ' + variable + ' at ' + self.source + '\n', exc)
-    sys.stdout.flush()
-  return None
-
 class custom_breakpoint(gdb.Breakpoint):
   def __init__(self, source, action):
     gdb.Breakpoint.__init__(self, source)
@@ -165,8 +157,13 @@ class custom_breakpoint(gdb.Breakpoint):
   def stop(self):
     msg = {}
     for variablemap in self.variables:
-      msg[variablemap] = jsonify(self.variables[variablemap])
-  
+      try:
+        msg[variablemap] = marshal(gdb.parse_and_eval(self.variables[variablemap]))
+      except Exception as exc:
+        print('vygdb.custom_breakpoint error: Could not access variable ' + self.variables[variablemap] + ' at ' + self.source + '\n', exc)
+        sys.stdout.flush()
+        return True
+
     stop_ = self.breakstop
     if msg and self.topic is None and self.method is None: # No topic or method just print
       for x in msg:
@@ -281,15 +278,11 @@ def parse_sources(replace_paths=[]):
 
 def get_command():
   cmd = user_command.get()
-  if cmd.startswith('vy c '):
+  if cmd.startswith('v '):
     try:
-      print(marshal(gdb.parse_and_eval(cmd[5:])))
+      print(gdb.parse_and_eval(cmd[2:]))
     except Exception as exc:
       print(exc)
-    sys.stdout.flush()
-    cmd = None
-  elif cmd.startswith('vy p '):
-    print(jsonify(cmd[5:]))
     sys.stdout.flush()
     cmd = None
   elif cmd.startswith('activate '):
