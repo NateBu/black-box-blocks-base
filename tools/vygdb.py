@@ -280,7 +280,7 @@ def get_command():
   cmd = user_command.get()
   if cmd.startswith('v '):
     try:
-      print(gdb.parse_and_eval(cmd[2:]))
+      print(marshal(gdb.parse_and_eval(cmd[2:])))
     except Exception as exc:
       print(exc)
     sys.stdout.flush()
