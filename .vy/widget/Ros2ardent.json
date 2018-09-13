@@ -2,13 +2,14 @@
   "#thingtype": "widget",
   "calibration": [],
   "collection": {},
-  "name": "_:Base:Ros2ardent",
   "copy": [
     {
       "destination": "build.sh",
       "source": "path::_:Base:/tools/ros2.sh"
     }
   ],
+  "name": "_:Base:Ros2ardent",
+  "share": [],
   "signal": [],
   "society": [],
   "summary": "-",

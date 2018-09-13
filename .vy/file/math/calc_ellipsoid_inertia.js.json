@@ -1,0 +1,1 @@
+"calc_ellipsoid_inertia = function(dx,dy,dz,density) {\n  var mass = density*dx*dy*dz*4/3*Math.PI;\n  var Ix = (dy*dy+dz*dz)*mass/5;\n  var Iy = (dx*dx+dz*dz)*mass/5;\n  var Iz = (dy*dy+dx*dx)*mass/5;\n  return {mass:mass,Ix:Ix,Iy:Iy,Iz:Iz};\n};"
