@@ -19,8 +19,8 @@
     }
   ],
   "collection": {},
+  "copy": [],
   "name": "_:Base:PathMaker",
-  "pathmap": [],
   "share": [
     {
       "name": "--",

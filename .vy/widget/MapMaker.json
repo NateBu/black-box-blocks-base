@@ -19,8 +19,8 @@
     }
   ],
   "collection": {},
+  "copy": [],
   "name": "_:Base:MapMaker",
-  "pathmap": [],
   "share": [
     {
       "name": "polygon_area",
