@@ -3,10 +3,10 @@
   "calibration": [],
   "collection": {},
   "name": "_:Base:Ros2ardent",
-  "share": [
+  "copy": [
     {
-      "name": "build.sh",
-      "type": "file::_:Base:/tools/ros2.sh"
+      "destination": "build.sh",
+      "source": "path::_:Base:/tools/ros2.sh"
     }
   ],
   "signal": [],
