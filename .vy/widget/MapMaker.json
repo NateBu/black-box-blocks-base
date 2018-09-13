@@ -24,11 +24,11 @@
   "share": [
     {
       "name": "polygon_area",
-      "type": "file::_:Base:/ui/polygon_area.js"
+      "type": "file::_:Base:ui/polygon_area.js"
     },
     {
       "name": "--",
-      "type": "file::_:Base:/ui/MapMaker.js"
+      "type": "file::_:Base:ui/MapMaker.js"
     }
   ],
   "signal": [

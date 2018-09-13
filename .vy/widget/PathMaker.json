@@ -24,7 +24,7 @@
   "share": [
     {
       "name": "--",
-      "type": "file::_:Base:/ui/PathMaker.js"
+      "type": "file::_:Base:ui/PathMaker.js"
     }
   ],
   "signal": [],
