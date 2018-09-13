@@ -6,12 +6,12 @@
       "type": "int32"
     },
     {
-      "length": 0,
+      "length": "0",
       "name": "attributes",
       "type": "signal::_:Base:KeyValue"
     },
     {
-      "length": 0,
+      "length": "0",
       "name": "shapes",
       "type": "signal::_:Base:Shape"
     }

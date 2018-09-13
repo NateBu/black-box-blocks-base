@@ -10,12 +10,12 @@
       "type": "string"
     },
     {
-      "length": 0,
+      "length": "0",
       "name": "attributes",
       "type": "signal::_:Base:KeyValue"
     },
     {
-      "length": 0,
+      "length": "0",
       "name": "vertices",
       "type": "signal::_:Base:Point2D"
     }
