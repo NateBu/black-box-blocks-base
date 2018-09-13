@@ -1,1 +1,0 @@
-"calc_box_inertia = function(dx,dy,dz,density) {\n  var mass = density*dx*dy*dz;\n  var Ix = (dy*dy+dz*dz)*mass/12;\n  var Iy = (dx*dx+dz*dz)*mass/12;\n  var Iz = (dy*dy+dx*dx)*mass/12;\n  return {mass:mass,Ix:Ix,Iy:Iy,Iz:Iz};\n};"
