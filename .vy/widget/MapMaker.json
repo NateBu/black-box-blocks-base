@@ -2,20 +2,14 @@
   "#thingtype": "widget",
   "calibration": [
     {
-      "defaultvalue": "mapreq",
-      "name": "MapRequest",
+      "defaultvalue": "set_map",
+      "name": "set_map",
       "type": "String"
     },
     {
-      "defaultvalue": "mapresp",
-      "name": "MapResponse",
+      "defaultvalue": "publish_map",
+      "name": "publish_map",
       "type": "String"
-    },
-    {
-      "defaultvalue": "{}",
-      "hidden": true,
-      "name": "map",
-      "type": "signal::_:Base:Mapx"
     }
   ],
   "collection": {},
@@ -34,14 +28,14 @@
   "signal": [
     {
       "action": "Subscribe",
-      "jsmethod": "map_request",
-      "name": ":::MapRequest:::",
+      "jsmethod": "set_map",
+      "name": ":::set_map:::",
       "type": "signal::_:Base:Mapx"
     },
     {
       "action": "Publish",
-      "jsmethod": "map_response",
-      "name": ":::MapResponse:::",
+      "jsmethod": "publish_map",
+      "name": ":::publish_map:::",
       "type": "signal::_:Base:Mapx"
     }
   ],

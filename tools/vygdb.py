@@ -193,7 +193,7 @@ class custom_breakpoint(gdb.Breakpoint):
     return stop_
 
 def exit_handler (event):
-  gdb.execute("quit")
+  gdb.execute("quit $_exitcode") # exit gdb with exit code of program
 
 def activate(filterlist=[], exclusive=False):
   __action_assignment__(filterlist, True, exclusive)
