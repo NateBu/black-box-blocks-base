@@ -18,8 +18,6 @@
       "type": "signal::_:Base:PathList"
     }
   ],
-  "collection": {},
-  "copy": [],
   "name": "_:Base:PathMaker",
   "share": [
     {
@@ -29,6 +27,5 @@
   ],
   "signal": [],
   "society": [],
-  "summary": "-",
-  "widget": []
+  "summary": "-"
 }

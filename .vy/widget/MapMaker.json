@@ -12,8 +12,6 @@
       "type": "String"
     }
   ],
-  "collection": {},
-  "copy": [],
   "name": "_:Base:MapMaker",
   "share": [
     {
@@ -40,6 +38,5 @@
     }
   ],
   "society": [],
-  "summary": "-",
-  "widget": []
+  "summary": "-"
 }
