@@ -1,7 +1,6 @@
 output = {
   __clear__:function() {
     this.points = [];       // Points on unclosed polygon
-    this.map = {'shapes':[]};     // Closed polygons
     this.draw();
   },
   
@@ -20,8 +19,16 @@ output = {
     this.__clear__();
   },
     
+  __init__:function() {
+    if (!this.__calibration__.map.hasOwnProperty('shapes')) {
+      this.__calibration__.map = {"shapes":[]};
+    }
+    this.draw();
+  },
+  
   update:function() {
-    this.__publishers__.publish_map(this.map);
+    this.__publishers__.publish_map(this.__calibration__.map);
+    this.__calibrate__("map",this.__calibration__.map);
   },
   
   __d3init__:function(d3p) {
@@ -55,9 +62,9 @@ output = {
   
   drawpoly:function(idx) {
     var self = this;
-    if (idx >= this.map.shapes.length || idx < 0)
+    if (idx >= this.__calibration__.map.shapes.length || idx < 0)
       return;
-    var poly = this.map.shapes[idx];
+    var poly = this.__calibration__.map.shapes[idx];
 
     var color = this.polygonColor(poly);
     this.g.selectAll('g.shape_id'+poly.id).remove();
@@ -142,12 +149,12 @@ output = {
   
   draw:function() {
     // Draw unfinished polygon
-    if (this.g ===  null) return;
+    if (this.g ===  null || !this.hasOwnProperty('__calibration')) return;
     this.drawunfinished();
 
     // Draw all finished polygons
     this.g.selectAll('g.shape').remove();
-    for (var j = 0; j < this.map.shapes.length; j++) {
+    for (var j = 0; j < this.__calibration__.map.shapes.length; j++) {
       this.drawpoly(j);
     }
   },
@@ -180,11 +187,11 @@ output = {
       var x_ = circle.attr('cx');
       var y_ = circle.attr('cy');
       if ((x_===x && y_===y)) {
-        this.map.shapes[idx].vertices[i] = {x:this.xScale.invert(x_), y:this.yScale.invert(y_)};
+        this.__calibration__.map.shapes[idx].vertices[i] = {x:this.xScale.invert(x_), y:this.yScale.invert(y_)};
       } else if (d3.event.sourceEvent.shiftKey) {
         x_ = parseInt(x_)+d3.event.dx;
         y_ = parseInt(y_)+d3.event.dy;
-        this.map.shapes[idx].vertices[i] = {x:this.xScale.invert(x_),y:this.yScale.invert(y_)};
+        this.__calibration__.map.shapes[idx].vertices[i] = {x:this.xScale.invert(x_),y:this.yScale.invert(y_)};
         circle.attr('cx', x_);
         circle.attr('cy', y_);
       }
@@ -200,15 +207,15 @@ output = {
     var xG = this.xScale.invert(xy.x);
     var yG = this.yScale.invert(xy.y)
     if (!d3.event.shiftKey) {
-      for (var i = this.map.shapes.length-1; i>=0; i--) {
-        var n = this.map.shapes[i].vertices.length;
+      for (var i = this.__calibration__.map.shapes.length-1; i>=0; i--) {
+        var n = this.__calibration__.map.shapes[i].vertices.length;
         for (var j = 0; j < n; j++) {
-          var p0 = (j===0) ? this.map.shapes[i].vertices[n-1] : this.map.shapes[i].vertices[j-1];
-          var p1 = this.map.shapes[i].vertices[j];
+          var p0 = (j===0) ? this.__calibration__.map.shapes[i].vertices[n-1] : this.__calibration__.map.shapes[i].vertices[j-1];
+          var p1 = this.__calibration__.map.shapes[i].vertices[j];
           p0 = {x:this.xScale(p0.x),y:this.yScale(p0.y)};
           p1 = {x:this.xScale(p1.x),y:this.yScale(p1.y)};
           if (this.onsegment(xy, p0, p1, this.radius)) { // in screen coordinates
-            this.map.shapes[i].vertices.splice(j,0,{x:xG,y:yG});
+            this.__calibration__.map.shapes[i].vertices.splice(j,0,{x:xG,y:yG});
             this.drawpoly(i);
             this.update();
             return;
@@ -245,12 +252,12 @@ output = {
         var v = this.points.splice(0);
         var area = polygon_area.signed_area(v);
         var typ = (area > 0) ? 'drivable' : 'obstacle';
-        this.map.shapes.push({'vertices':v,'id':id,'type':typ}); // move unclosed point to the closed set
+        this.__calibration__.map.shapes.push({'vertices':v,'id':id,'type':typ}); // move unclosed point to the closed set
         this.update();
-        this.editing = this.map.shapes.length-1;
+        this.editing = this.__calibration__.map.shapes.length-1;
       }
       this.drawunfinished();
-      this.drawpoly(this.map.shapes.length-1);
+      this.drawpoly(this.__calibration__.map.shapes.length-1);
       this.drawing = false;
     }
   },
@@ -258,10 +265,10 @@ output = {
   set_map:function(msg) {
     this.__clear__();
     if (msg && msg.hasOwnProperty('shapes') ) {
-      this.map = msg;
-      if (this.map.shapes.length > 0 && this.map.shapes[0].hasOwnProperty('vertices') && this.map.shapes[0].vertices.length > 0) {
-        console.log('First vertex:',this.map.shapes[0].vertices[0])
+      if (msg.shapes.length > 0 && msg.shapes[0].hasOwnProperty('vertices') && msg.shapes[0].vertices.length > 0) {
+        console.log('First vertex:',msg.shapes[0].vertices[0])
       }
+      this.__calibrate__("map",msg)
     }
     this.draw();
   },

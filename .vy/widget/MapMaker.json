@@ -10,6 +10,12 @@
       "defaultvalue": "publish_map",
       "name": "publish_map",
       "type": "String"
+    },
+    {
+      "defaultvalue": "{}",
+      "hidden": true,
+      "name": "map",
+      "type": "signal::_:Base:Mapx"
     }
   ],
   "name": "_:Base:MapMaker",
