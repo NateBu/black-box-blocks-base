@@ -12,7 +12,7 @@
       "type": "String"
     },
     {
-      "defaultvalue": "{}",
+      "defaultvalue": "{\"paths\":[]}",
       "hidden": true,
       "name": "pathlist",
       "type": "signal::_:Base:PathList"

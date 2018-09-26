@@ -1,38 +1,41 @@
 output = {
-  constructor:function() {
+  __clear__: function() {
+  },
+  
+  __constructor__:function() {
     this.radius = 6;
     this.dragging = false;
     this.drawing = -1;
-    this.paths = [];
     this.xScale = null;
     this.yScale = null;
     this.drag = null;
     this.g = null;
-    this.context = null;
+    this.__clear__();
   },
   
   update:function() {
-    this.context.calibration.pathlist.paths = this.paths;
-    this.context.calibration.__set__('pathlist',this.context.calibration.pathlist);
+    this.__calibrate__({'pathlist':this.__calibration__.pathlist});
   },
   
-  calibrate:function(context) {
-    this.context = context;
-    this.paths = (context.calibration.pathlist.hasOwnProperty('paths')) ? 
-      context.calibration.pathlist.paths : [];
-    if (this.g) this.draw();
+  __init__:function() {
+    if (!this.__calibration__.pathlist.hasOwnProperty('paths')) {
+      this.__calibration__.pathlist = {paths:[]};
+      this.update();
+    } else {
+      this.draw();
+    }
   },
   
-  initialize:function(xScale,yScale,g) {
-    this.xScale = xScale;
-    this.yScale = yScale;
-    var thisx = this;
+  __d3init__:function(d3p) {
+    this.xScale = d3p.xScale;
+    this.yScale = d3p.yScale;
+    var self = this;
     this.drag = d3.behavior.drag().on("drag", function(d,i) {
-      thisx.handleDrag_points(this);
+      self.handleDrag_points(this);
     }).on('dragend', function(d){
-      thisx.handleDragEnd_points(this);
+      self.handleDragEnd_points(this);
     });
-    this.g = g;
+    this.g = d3p.g;
     this.draw();
   },
   
@@ -68,9 +71,9 @@ output = {
         d3.select(this).remove();       // Remove the circle handle
         path.vertices.splice(i,1);      // Remove point from vertices
         if (path.vertices.length<2) {   // Remove the whole path
-          for (var i = self.paths.length-1; i>=0; i--) {
-            if (self.paths[i].vertices.length < 2) {
-              self.paths.splice(i,1);
+          for (var i = self.__calibration__.pathlist.paths.length-1; i>=0; i--) {
+            if (self.__calibration__.pathlist.paths[i].vertices.length < 2) {
+              self.__calibration__.pathlist.paths.splice(i,1);
               self.update()
             }
           }
@@ -83,11 +86,12 @@ output = {
   },
   
   draw:function() {
+    if (this.g === null || !this.hasOwnProperty('__calibration__')) return;
     var self = this;
     this.g.select('line').remove();
     this.g.selectAll('g.path').remove();
-    for (var j = 0; j < this.paths.length; j++) {
-      var path = this.paths[j];
+    for (var j = 0; j < this.__calibration__.pathlist.paths.length; j++) {
+      var path = this.__calibration__.pathlist.paths[j];
       var color = this.pathColor(path);
       this.g.selectAll('g.path_id'+path.id).remove();
       var g = this.g.append('g')
@@ -134,11 +138,11 @@ output = {
       var x_ = circle.attr('cx');
       var y_ = circle.attr('cy');
       if ((x_===x && y_===y)) {
-        this.paths[idx].vertices[i] = {x:this.xScale.invert(x_),y:this.yScale.invert(y_)};
+        this.__calibration__.pathlist.paths[idx].vertices[i] = {x:this.xScale.invert(x_),y:this.yScale.invert(y_)};
       } else if (d3.event.sourceEvent.shiftKey) {
         x_ = parseInt(x_) + d3.event.dx;
         y_ = parseInt(y_) + d3.event.dy;
-        this.paths[idx].vertices[i] = {x:this.xScale.invert(x_),y:this.yScale.invert(y_)};
+        this.__calibration__.pathlist.paths[idx].vertices[i] = {x:this.xScale.invert(x_),y:this.yScale.invert(y_)};
         circle.attr('cx', x_);
         circle.attr('cy', y_);
       }
@@ -147,7 +151,7 @@ output = {
     poly.attr('points', newPoints);
   },
   
-  mouseUp:function(self, activemenu) {
+  __mouseUp__:function(self, activemenu) {
     if (!activemenu) return;
     if (this.dragging) return;
     var xS = d3.mouse(self)[0]
@@ -155,16 +159,16 @@ output = {
     var xG = this.xScale.invert(xS);
     var yG = this.yScale.invert(yS)
     if (!d3.event.shiftKey) {
-      for (var i = this.paths.length-1; i>=0; i--) {
-        var n = this.paths[i].vertices.length;
+      for (var i = this.__calibration__.pathlist.paths.length-1; i>=0; i--) {
+        var n = this.__calibration__.pathlist.paths[i].vertices.length;
         for (var j = 1; j < n; j++) {
-          var p0 = this.paths[i].vertices[j-1];
-          var p1 = this.paths[i].vertices[j];
+          var p0 = this.__calibration__.pathlist.paths[i].vertices[j-1];
+          var p1 = this.__calibration__.pathlist.paths[i].vertices[j];
           p0 = {x:this.xScale(p0.x),y:this.yScale(p0.y)};
           p1 = {x:this.xScale(p1.x),y:this.yScale(p1.y)};
           if (this.onsegment({x:xS,y:yS}, p0, p1, this.radius)) { // in screen coordinates
             if (this.drawing === i) {
-              this.paths[i].vertices.splice(j,0,{x:xG,y:yG});
+              this.__calibration__.pathlist.paths[i].vertices.splice(j,0,{x:xG,y:yG});
             } else {
               this.drawing = i;
             }
@@ -176,22 +180,22 @@ output = {
       }
     } else {
       if (this.drawing === -1) {
-        this.drawing = this.paths.length;
+        this.drawing = this.__calibration__.pathlist.paths.length;
         var id = math.random().toString(36).slice(2);
-        this.paths.push({'id':id,'vertices':[{x:xG,y:yG}]});
+        this.__calibration__.pathlist.paths.push({'id':id,'vertices':[{x:xG,y:yG}]});
       } else {
-        this.paths[this.drawing].vertices.push({x:xG,y:yG});
+        this.__calibration__.pathlist.paths[this.drawing].vertices.push({x:xG,y:yG});
       }
       this.update();
     }
     this.draw();
   },
   
-  mouseMove:function(self, activemenu) {
+  __mouseMove__:function(self, activemenu) {
     if (!activemenu) return;
     if (this.drawing < 0 || !d3.event.shiftKey) return;
     this.g.select('line').remove();
-    var v = this.paths[this.drawing].vertices;
+    var v = this.__calibration__.pathlist.paths[this.drawing].vertices;
     var p = v[v.length-1];
     this.g.append('line')
       .attr('x1', this.xScale(p.x))
@@ -202,12 +206,12 @@ output = {
       .attr('stroke-width', 1);      
   },
   
-  keyUp:function(self, activemenu) {
+  __keyUp__:function(self, activemenu) {
     if (!activemenu) return;
     var key = d3.event.keyCode;
     if (key==16) {
-      if (this.drawing>=0 && this.paths[this.drawing].vertices.length < 2) {
-        this.paths.splice(this.drawing,1);
+      if (this.drawing>=0 && this.__calibration__.pathlist.paths[this.drawing].vertices.length < 2) {
+        this.__calibration__.pathlist.paths.splice(this.drawing,1);
         this.update();
       }
       this.drawing = -1;
@@ -217,10 +221,10 @@ output = {
   
   path_request:function(msg) {
     this.update();
-    this.context.publishers.path_response(this.context.calibration.pathlist);
+    this.__publishers__.path_response(this.__calibration__.pathlist);
   },
   
-  zoom:function(self) {
+  __zoom__:function(self) {
     this.draw();
   }
 }
