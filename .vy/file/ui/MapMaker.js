@@ -20,15 +20,12 @@ output = {
   },
     
   __init__:function() {
-    if (!this.__calibration__.map.hasOwnProperty('shapes')) {
-      this.__calibration__.map = {"shapes":[]};
-    }
     this.draw();
   },
   
   update:function() {
     this.__publishers__.publish_map(this.__calibration__.map);
-    this.__calibrate__("map",this.__calibration__.map);
+    this.__calibrate__({"map":this.__calibration__.map});
   },
   
   __d3init__:function(d3p) {
@@ -111,9 +108,9 @@ output = {
           d3.select(this).remove();       // Remove the circle handle
           poly.vertices.splice(i,1);      // Remove point from vertices
           if (poly.vertices.length<3) {   // Remove the whole polygon
-            for (var i = self.map.shapes.length-1; i>=0; i--) {
-              if (self.map.shapes[i].vertices.length < 3) {
-                self.map.shapes.splice(i,1);
+            for (var i = self.__calibration__.map.shapes.length-1; i>=0; i--) {
+              if (self.__calibration__.map.shapes[i].vertices.length < 3) {
+                self.__calibration__.map.shapes.splice(i,1);
               }
             }
             g.remove();
@@ -149,7 +146,7 @@ output = {
   
   draw:function() {
     // Draw unfinished polygon
-    if (this.g ===  null || !this.hasOwnProperty('__calibration')) return;
+    if (this.g ===  null || !this.hasOwnProperty('__calibration__')) return;
     this.drawunfinished();
 
     // Draw all finished polygons
@@ -268,7 +265,7 @@ output = {
       if (msg.shapes.length > 0 && msg.shapes[0].hasOwnProperty('vertices') && msg.shapes[0].vertices.length > 0) {
         console.log('First vertex:',msg.shapes[0].vertices[0])
       }
-      this.__calibrate__("map",msg)
+      this.__calibrate__({"map":msg});
     }
     this.draw();
   },
