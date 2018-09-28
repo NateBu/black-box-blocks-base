@@ -12,7 +12,7 @@
       "type": "String"
     },
     {
-      "defaultvalue": "{\"shapes\":[]}",
+      "defaultvalue": "{}",
       "hidden": true,
       "name": "map",
       "type": "signal::_:Base:Mapx"
