@@ -22,6 +22,15 @@ SOCK = None
 VYGDB = {'METHODS':{},'MARSHALS':{},'BREAKPOINTS':[]}
 user_command = Queue()
 
+vyjob = os.environ['VYJOB']
+
+def send_to_vyclient(labl,data):
+  msg = {'job':vyjob}
+  if labl == 'job':
+    return
+  msg[labl] = data
+  SOCK.send(msg)
+
 class ParseSourceException(Exception):
     pass
 
@@ -287,7 +296,10 @@ def get_command():
   cmd = user_command.get()
   if cmd.startswith('v '):
     try:
-      print(marshal(gdb.parse_and_eval(cmd[2:])))
+      rslt = marshal(gdb.parse_and_eval(cmd[2:]))
+      print(rslt)
+      #SOCK.send({'vygdb_data':{"topic":"x","variables":{"y":rslt}}})
+
     except Exception as exc:
       print(exc)
     sys.stdout.flush()
@@ -343,15 +355,17 @@ if __name__ == '__main__':
   host = subprocess.check_output("/sbin/ip route|awk '/default/ { print $3 }'",shell=True).decode('ascii').strip()
   port = int(os.environ['VYCMDPORT'])
   with Client((host, port)) as SOCK:
-    SOCK.send({'vygdb_getactions':None,'projectname':os.environ['VYPROJECTNAME'],'projecttype':os.environ['VYPROJECTTYPE']})
-    data = SOCK.recv()
-    if 'BREAKPOINTS' in data:
-      VYGDB['BREAKPOINTS'] += data['BREAKPOINTS']
-    if 'SCRIPTS' in data:
-      vyscripts += data['SCRIPTS']
+    #SOCK.send({'vygdb_getactions':None,'job':os.environ['VYJOB']})
+    #data = SOCK.recv()
+    for bp in json.loads(os.environ['VYBREAKPOINTS']):
+      if 'variables' in bp and type(bp['variables']) == str:
+        bp['variables'] = json.loads(bp['variables'])
+      VYGDB['BREAKPOINTS'].append(bp)
+
+    vyscripts += [scrpt['code'] for srcpt in json.loads(os.environ['VYBREAKSCRIPTS'])]
     marshals_and_methods(vyscripts)
 
-    activate(["proximityc"],True)
+    #activate(["proximityc"],True)
     threading.Thread(target=cmd_listener, daemon=True).start()
     gdb.execute("run")
     lastcmd = None
