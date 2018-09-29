@@ -1,5 +1,7 @@
 {
   "#thingtype": "widget",
+  "breakpoint": [],
+  "breakscript": [],
   "calibration": [
     {
       "defaultvalue": "pathreq",
