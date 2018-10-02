@@ -203,23 +203,22 @@ output = {
     var xy = {x:d3.mouse(self)[0], y:d3.mouse(self)[1]};
     var xG = this.xScale.invert(xy.x);
     var yG = this.yScale.invert(xy.y)
-    if (!d3.event.shiftKey) {
-      for (var i = this.__calibration__.map.shapes.length-1; i>=0; i--) {
-        var n = this.__calibration__.map.shapes[i].vertices.length;
-        for (var j = 0; j < n; j++) {
-          var p0 = (j===0) ? this.__calibration__.map.shapes[i].vertices[n-1] : this.__calibration__.map.shapes[i].vertices[j-1];
-          var p1 = this.__calibration__.map.shapes[i].vertices[j];
-          p0 = {x:this.xScale(p0.x),y:this.yScale(p0.y)};
-          p1 = {x:this.xScale(p1.x),y:this.yScale(p1.y)};
-          if (this.onsegment(xy, p0, p1, this.radius)) { // in screen coordinates
-            this.__calibration__.map.shapes[i].vertices.splice(j,0,{x:xG,y:yG});
-            this.drawpoly(i);
-            this.update();
-            return;
-          }
+    if (this.editing >= 0 && this.editing < this.__calibration__.map.shapes.length && !d3.event.shiftKey) {
+      var i = this.editing;
+      var n = this.__calibration__.map.shapes[i].vertices.length;
+      for (var j = 0; j < n; j++) {
+        var p0 = (j===0) ? this.__calibration__.map.shapes[i].vertices[n-1] : this.__calibration__.map.shapes[i].vertices[j-1];
+        var p1 = this.__calibration__.map.shapes[i].vertices[j];
+        p0 = {x:this.xScale(p0.x),y:this.yScale(p0.y)};
+        p1 = {x:this.xScale(p1.x),y:this.yScale(p1.y)};
+        if (this.onsegment(xy, p0, p1, this.radius)) { // in screen coordinates
+          this.__calibration__.map.shapes[i].vertices.splice(j,0,{x:xG,y:yG});
+          this.drawpoly(i);
+          this.update();
+          return;
         }
       }
-    } else {
+    } else if (d3.event.shiftKey) {
       this.drawing = true;
       this.startPoint = xy;
       this.points.push({x:xG , y:yG});
