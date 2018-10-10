@@ -1,6 +1,7 @@
 output = {
   __clear__:function() {
     this.points = [];       // Points on unclosed polygon
+    this.order = [];
     this.draw();
   },
   
@@ -78,6 +79,7 @@ output = {
         .style('fill',color)
         .style('fill-opacity',0.4)
         .on('dblclick', function(d,i) {
+          console.log('Selected the ('+idx+'th) shape: '+d.id,d.vertices);
           var parent = d3.select(this.parentNode);
           if (self.editing === idx) {
             self.editing = -1;
@@ -85,9 +87,8 @@ output = {
           } else {
             var current = self.editing;
             self.editing = idx;
-            self.drawpoly(current);
-            self.drawpoly(idx);
           }
+          self.draw();
         })
         .style('stroke','white');
     
@@ -151,8 +152,15 @@ output = {
 
     // Draw all finished polygons
     this.g.selectAll('g.shape').remove();
-    for (var j = 0; j < this.__calibration__.map.shapes.length; j++) {
-      this.drawpoly(j);
+    var ns = this.__calibration__.map.shapes.length;
+    if (this.order.length != ns) {
+      this.order = [];
+      for (var ii=0; ii<ns; ii++) {
+        this.order.push(ii);
+      };
+    }
+    for (var j = 0; j < ns; j++) {
+      this.drawpoly(this.order[j]);
     }
   },
   
@@ -242,7 +250,21 @@ output = {
   __keyUp__:function(self, activemenu) {
     if (!activemenu) return;
     var key = d3.event.keyCode;
-    if (key==16) {
+    if (key==40 && this.editing >= 0) { // down arrow
+      var idx = this.order.indexOf(this.editing);
+      if (idx > 0 && idx < this.order.length) {
+        this.order[idx] = this.order[idx-1];
+        this.order[idx-1] = this.editing;
+        this.draw();
+      }
+    } else if (key==38 && this.editing >= 0) { // up arrow
+      var idx = this.order.indexOf(this.editing);
+      if (idx > -1 && idx < this.order.length-1) {
+        this.order[idx] = this.order[idx+1];
+        this.order[idx+1] = this.editing;
+        this.draw();
+      }
+    } else if (key==16) { //shift
       if (this.points.length > 2) {
         var id = math.random().toString(36).slice(2);
         var v = this.points.splice(0);

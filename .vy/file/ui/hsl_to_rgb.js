@@ -31,3 +31,8 @@ hsl_to_rgb = function(h, s, l){
     }
     return [r,g,b];
 };
+
+hsl_to_color = function(h, s, l) {
+  v = hsl_to_rgb(h,s,l);
+  return 'rgb('+Math.floor(v[0]*255)+','+Math.floor(v[1]*255)+','+Math.floor(v[2]*255)+')';
+}

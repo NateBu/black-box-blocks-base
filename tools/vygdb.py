@@ -34,6 +34,23 @@ def send_to_vyclient(labl,data):
 class ParseSourceException(Exception):
     pass
 
+def find_type(orig, name):
+  typ = orig.strip_typedefs()
+  while True:
+    # Strip cv-qualifiers.  PR 67440.
+    search = '%s::%s' % (typ.unqualified(), name)
+    try:
+        return gdb.lookup_type(search)
+    except RuntimeError:
+        pass
+    # The type was not found, so try the superclass.  We only need
+    # to check the first superclass, so we don't bother with
+    # anything fancier here.
+    field = typ.fields()[0]
+    if not field.is_base_class:
+      raise ValueError("Cannot find type %s::%s" % (str(orig), name))
+  typ = field.type
+
 class _iterator:
   def __init__ (self, start, finish):
     self.item = start
@@ -119,6 +136,8 @@ def marshal(variable):
       x = marshal(variable.referenced_value())
     elif typ.code in [gdb.TYPE_CODE_PTR]:
       x = marshal(variable.dereference())
+    elif vtype.find("const std::shared_ptr") == 0 or vtype.find("std::shared_ptr") == 0:
+      x = marshal(variable['_M_ptr'].referenced_value())
     elif typ.code == gdb.TYPE_CODE_VOID:
       x = None
     elif vtype.find("const std::vector") == 0 or vtype.find("std::vector") == 0:
@@ -142,7 +161,7 @@ def marshal(variable):
     elif typ.code in [gdb.TYPE_CODE_ENUM]:
       x = '"'+str(variable)+'"' # enums return as string not value
     elif vtype in VYGDB['MARSHALS']:
-      x = VYGDB['MARSHALS'][vtype](variable,marshal)
+      x = VYGDB['MARSHALS'][vtype](variable,marshal,gdb)
     else:
       x = _struct(variable)
   except Exception as exc:
@@ -196,12 +215,14 @@ class custom_breakpoint(gdb.Breakpoint):
     stop_ = self.breakstop
     if msg and self.topic is None and self.method is None: # No topic or method just print
       for x in msg:
-        print(x+':',msg[x])
+        print(x+':',json.dumps(msg[x]))
       sys.stdout.flush()
 
     if self.method is not None and self.method in VYGDB['METHODS']:
       try:
-        stop_ |= VYGDB['METHODS'][self.method](msg, {'queue':user_command, 'gdb':gdb, 'marshal':marshal})
+        stopb = VYGDB['METHODS'][self.method](msg, {'queue':user_command, 'gdb':gdb, 'marshal':marshal})
+        if type(stopb) == bool:
+          stop_ = stop_ or stopb
       except Exception as exc:
         print('vygdb.custom_breakpoint error: Problem running method ' + str(self.method) + ' at ' + self.source + '\n', exc)
         sys.stdout.flush()
@@ -298,7 +319,7 @@ def get_command():
   cmd = user_command.get()
   if cmd.startswith('v '):
     try:
-      print(marshal(gdb.parse_and_eval(cmd[2:])))
+      print("vygdb:: "+json.dumps(marshal(gdb.parse_and_eval(cmd[2:]))))
     except Exception as exc:
       print(exc)
     sys.stdout.flush()
@@ -312,6 +333,13 @@ def get_command():
       print('The topic command',cmd[3:],'must be json formatted and should have "topic" and "variables" fields')    
     sys.stdout.flush()
     cmd = None
+  elif cmd.startswith('e '):
+    try:
+      eval(cmd[2:])
+    except Exception as exc:
+      print(exc)
+    sys.stdout.flush()
+    cmd = None      
   elif cmd.startswith('vaction '):
     try:
       msg = json.loads(cmd[8:])

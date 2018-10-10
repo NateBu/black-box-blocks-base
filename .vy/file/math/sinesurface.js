@@ -1,13 +1,13 @@
 sinesurface = function(seed,gridd,maxamp,nfacets) {
   // A seeded RNG (same results for = values of gridd)
-  Math.seedrandom(''+seed+'')
+  Math.seedrandom(''+seed+'');
   var waves = [];
   for (var ii = 0;  ii < 10; ii++) {
     var amp = maxamp*Math.random();
-    var wvl = Math.max(.1,Math.random())*gridd;
+    var wvl = Math.max(0.1,Math.random())*gridd;
     var phi = Math.PI*Math.random();
     var psi = Math.PI*Math.random();
-    waves.push({'amplitude':amp,'wavelength':wvl,'azimuth':phi,'phase':psi})
+    waves.push({'amplitude':amp,'wavelength':wvl,'azimuth':phi,'phase':psi});
   }
   //waves = [[0.0,10.0,Math.PI/2.0,0.1]]
   
