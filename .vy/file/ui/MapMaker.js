@@ -21,6 +21,19 @@ output = {
   },
     
   __init__:function() {
+
+    // Make sure shapes have unique string ids
+    var replace = false;
+    var idlist = [];
+    this.__calibration__.map.shapes.forEach(function(shape) {
+      if (typeof(shape.id)==="number" || idlist.indexOf(shape.id) > -1) {
+        replace = true;
+        shape.id = math.random().toString(36).slice(2);
+      }
+      idlist.push(shape.id);
+    });
+  
+    if (replace) this.update();
     this.draw();
   },
   
@@ -65,6 +78,7 @@ output = {
     var poly = this.__calibration__.map.shapes[idx];
 
     var color = this.polygonColor(poly);
+    
     this.g.selectAll('g.shape_id'+poly.id).remove();
     var g = this.g.append('g')
       .classed('shape_id'+poly.id,true)

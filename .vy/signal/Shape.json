@@ -3,7 +3,7 @@
   "element": [
     {
       "name": "id",
-      "type": "int32"
+      "type": "string"
     },
     {
       "name": "type",
