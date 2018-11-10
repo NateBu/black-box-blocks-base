@@ -3,7 +3,7 @@
   "copypath": [],
   "copysignal": [],
   "copystage": [],
-  "from": "_:Base:Ros2Ardent",
+  "from": "_:Base:Ros2Bouncy",
   "name": "_:Base:gdbros2",
   "society": [],
   "text": "RUN apt-get install -y texinfo wget libreadline-dev xz-utils\nRUN wget http://ftp.gnu.org/gnu/gdb/gdb-8.1.tar.xz\nRUN tar -xf gdb-8.1.tar.xz\nWORKDIR gdb-8.1/\nRUN ./configure --prefix=/usr/local --with-python=/usr/bin/python3 --with-system-readline --without-guile && make -j8\nRUN make -C gdb install\nRUN cd .. && rm -r gdb-8.1 && rm -r gdb-8.1.tar.xz\n\nRUN wget https://www.python.org/ftp/python/3.5.1/Python-3.5.1.tgz\nRUN tar xf Python-3.5.1.tgz\nWORKDIR Python-3.5.1\nRUN ./configure --prefix=/usr/bin/python3.5.1 --with-pydebug\nRUN make EXTRA_CFLAGS=\"-DPy_REF_DEBUG\"\n#RUN make test\nRUN make install"
