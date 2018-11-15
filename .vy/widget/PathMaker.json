@@ -1,1 +1,35 @@
-"{\n  \"#thingtype\": \"widget\",\n  \"breakpoint\": [\n  ],\n  \"breakscript\": [\n  ],\n  \"calibration\": [\n    {\n      \"defaultvalue\": \"pathreq\",\n      \"name\": \"PathRequest\",\n      \"skipclean\": false,\n      \"type\": \"String\"\n    },\n    {\n      \"defaultvalue\": \"pathresp\",\n      \"name\": \"PathResponse\",\n      \"skipclean\": false,\n      \"type\": \"String\"\n    },\n    {\n      \"defaultvalue\": \"{\\\"paths\\\":[]}\",\n      \"name\": \"pathlist\",\n      \"skipclean\": false,\n      \"type\": \"signal::NateBu:Base:PathList\"\n    }\n  ],\n  \"name\": \"NateBu:Base:PathMaker\",\n  \"share\": [\n    {\n      \"name\": \"--\",\n      \"type\": \"file::NateBu:Base:ui/PathMaker.js\"\n    }\n  ],\n  \"signal\": [\n  ],\n  \"society\": [\n  ],\n  \"summary\": \"-\"\n}"
+{
+  "#thingtype": "widget",
+  "breakpoint": [],
+  "breakscript": [],
+  "calibration": [
+    {
+      "defaultvalue": "pathreq",
+      "name": "PathRequest",
+      "skipclean": false,
+      "type": "String"
+    },
+    {
+      "defaultvalue": "pathresp",
+      "name": "PathResponse",
+      "skipclean": false,
+      "type": "String"
+    },
+    {
+      "defaultvalue": "{\"paths\":[]}",
+      "name": "pathlist",
+      "skipclean": false,
+      "type": "signal::NateBu:Base:PathList"
+    }
+  ],
+  "name": "NateBu:Base:PathMaker",
+  "share": [
+    {
+      "name": "--",
+      "type": "file::NateBu:Base:ui/PathMaker.js"
+    }
+  ],
+  "signal": [],
+  "society": [],
+  "summary": "-"
+}

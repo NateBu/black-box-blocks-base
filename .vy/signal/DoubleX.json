@@ -1,1 +1,15 @@
-"{\n  \"#thingtype\": \"signal\",\n  \"element\": [\n    {\n      \"name\": \"id\",\n      \"type\": \"int32\"\n    },\n    {\n      \"name\": \"value\",\n      \"type\": \"float64\"\n    }\n  ],\n  \"name\": \"NateBu:Base:DoubleX\",\n  \"society\": [\n  ]\n}"
+{
+  "#thingtype": "signal",
+  "element": [
+    {
+      "name": "id",
+      "type": "int32"
+    },
+    {
+      "name": "value",
+      "type": "float64"
+    }
+  ],
+  "name": "NateBu:Base:DoubleX",
+  "society": []
+}

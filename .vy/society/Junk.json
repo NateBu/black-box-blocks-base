@@ -1,1 +1,6 @@
-"{\n  \"#invitees\": [\n  ],\n  \"#requests\": [\n  ],\n  \"#thingtype\": \"society\",\n  \"name\": \"NateBu:Base:Junk\"\n}"
+{
+  "#invitees": [],
+  "#requests": [],
+  "#thingtype": "society",
+  "name": "NateBu:Base:Junk"
+}

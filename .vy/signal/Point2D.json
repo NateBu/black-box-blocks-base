@@ -1,1 +1,15 @@
-"{\n  \"#thingtype\": \"signal\",\n  \"element\": [\n    {\n      \"name\": \"x\",\n      \"type\": \"float64\"\n    },\n    {\n      \"name\": \"y\",\n      \"type\": \"float64\"\n    }\n  ],\n  \"name\": \"NateBu:Base:Point2D\",\n  \"society\": [\n  ]\n}"
+{
+  "#thingtype": "signal",
+  "element": [
+    {
+      "name": "x",
+      "type": "float64"
+    },
+    {
+      "name": "y",
+      "type": "float64"
+    }
+  ],
+  "name": "NateBu:Base:Point2D",
+  "society": []
+}

@@ -1,1 +1,16 @@
-"{\n  \"#thingtype\": \"signal\",\n  \"element\": [\n    {\n      \"name\": \"id\",\n      \"type\": \"int32\"\n    },\n    {\n      \"length\": \"0\",\n      \"name\": \"paths\",\n      \"type\": \"signal::NateBu:Base:Shape\"\n    }\n  ],\n  \"name\": \"NateBu:Base:PathList\",\n  \"society\": [\n  ]\n}"
+{
+  "#thingtype": "signal",
+  "element": [
+    {
+      "name": "id",
+      "type": "int32"
+    },
+    {
+      "length": "0",
+      "name": "paths",
+      "type": "signal::NateBu:Base:Shape"
+    }
+  ],
+  "name": "NateBu:Base:PathList",
+  "society": []
+}

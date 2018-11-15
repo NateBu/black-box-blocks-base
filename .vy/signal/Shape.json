@@ -1,1 +1,25 @@
-"{\n  \"#thingtype\": \"signal\",\n  \"element\": [\n    {\n      \"name\": \"id\",\n      \"type\": \"string\"\n    },\n    {\n      \"name\": \"type\",\n      \"type\": \"string\"\n    },\n    {\n      \"length\": \"0\",\n      \"name\": \"attributes\",\n      \"type\": \"signal::NateBu:Base:KeyValue\"\n    },\n    {\n      \"length\": \"0\",\n      \"name\": \"vertices\",\n      \"type\": \"signal::NateBu:Base:Point2D\"\n    }\n  ],\n  \"name\": \"NateBu:Base:Shape\",\n  \"society\": [\n  ]\n}"
+{
+  "#thingtype": "signal",
+  "element": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "type",
+      "type": "string"
+    },
+    {
+      "length": "0",
+      "name": "attributes",
+      "type": "signal::NateBu:Base:KeyValue"
+    },
+    {
+      "length": "0",
+      "name": "vertices",
+      "type": "signal::NateBu:Base:Point2D"
+    }
+  ],
+  "name": "NateBu:Base:Shape",
+  "society": []
+}
