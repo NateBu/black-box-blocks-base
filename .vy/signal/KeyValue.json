@@ -1,15 +1,1 @@
-{
-  "#thingtype": "signal",
-  "element": [
-    {
-      "name": "key",
-      "type": "string"
-    },
-    {
-      "name": "value",
-      "type": "string"
-    }
-  ],
-  "name": "_:Base:KeyValue",
-  "society": []
-}
+"{\n  \"#thingtype\": \"signal\",\n  \"element\": [\n    {\n      \"name\": \"key\",\n      \"type\": \"string\"\n    },\n    {\n      \"name\": \"value\",\n      \"type\": \"string\"\n    }\n  ],\n  \"name\": \"NateBu:Base:KeyValue\",\n  \"society\": [\n  ]\n}"
