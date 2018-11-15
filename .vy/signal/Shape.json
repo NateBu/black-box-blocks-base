@@ -12,14 +12,14 @@
     {
       "length": "0",
       "name": "attributes",
-      "type": "signal::NateBu:Base:KeyValue"
+      "type": "signal::@@:Base:KeyValue"
     },
     {
       "length": "0",
       "name": "vertices",
-      "type": "signal::NateBu:Base:Point2D"
+      "type": "signal::@@:Base:Point2D"
     }
   ],
-  "name": "NateBu:Base:Shape",
+  "name": "@@:Base:Shape",
   "society": []
 }

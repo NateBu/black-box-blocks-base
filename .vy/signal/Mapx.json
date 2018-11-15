@@ -8,14 +8,14 @@
     {
       "length": "0",
       "name": "attributes",
-      "type": "signal::NateBu:Base:KeyValue"
+      "type": "signal::@@:Base:KeyValue"
     },
     {
       "length": "0",
       "name": "shapes",
-      "type": "signal::NateBu:Base:Shape"
+      "type": "signal::@@:Base:Shape"
     }
   ],
-  "name": "NateBu:Base:Mapx",
+  "name": "@@:Base:Mapx",
   "society": []
 }

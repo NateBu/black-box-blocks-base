@@ -10,6 +10,6 @@
       "type": "string"
     }
   ],
-  "name": "NateBu:Base:KeyValue",
+  "name": "@@:Base:KeyValue",
   "society": []
 }

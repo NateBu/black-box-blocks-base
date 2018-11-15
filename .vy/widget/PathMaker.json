@@ -19,14 +19,14 @@
       "defaultvalue": "{\"paths\":[]}",
       "name": "pathlist",
       "skipclean": false,
-      "type": "signal::NateBu:Base:PathList"
+      "type": "signal::@@:Base:PathList"
     }
   ],
-  "name": "NateBu:Base:PathMaker",
+  "name": "@@:Base:PathMaker",
   "share": [
     {
       "name": "--",
-      "type": "file::NateBu:Base:ui/PathMaker.js"
+      "type": "file::@@:Base:ui/PathMaker.js"
     }
   ],
   "signal": [],

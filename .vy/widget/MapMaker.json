@@ -19,18 +19,18 @@
       "defaultvalue": "{}",
       "name": "map",
       "skipclean": false,
-      "type": "signal::NateBu:Base:Mapx"
+      "type": "signal::@@:Base:Mapx"
     }
   ],
-  "name": "NateBu:Base:MapMaker",
+  "name": "@@:Base:MapMaker",
   "share": [
     {
       "name": "polygon_area",
-      "type": "file::NateBu:Base:ui/polygon_area.js"
+      "type": "file::@@:Base:ui/polygon_area.js"
     },
     {
       "name": "--",
-      "type": "file::NateBu:Base:ui/MapMaker.js"
+      "type": "file::@@:Base:ui/MapMaker.js"
     }
   ],
   "signal": [
@@ -38,13 +38,13 @@
       "action": "Subscribe",
       "jsmethod": "set_map",
       "name": ":::set_map:::",
-      "type": "signal::NateBu:Base:Mapx"
+      "type": "signal::@@:Base:Mapx"
     },
     {
       "action": "Publish",
       "jsmethod": "publish_map",
       "name": ":::publish_map:::",
-      "type": "signal::NateBu:Base:Mapx"
+      "type": "signal::@@:Base:Mapx"
     }
   ],
   "society": [],
