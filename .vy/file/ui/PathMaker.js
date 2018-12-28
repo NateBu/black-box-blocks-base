@@ -10,6 +10,7 @@ output = {
     this.yScale = null;
     this.drag = null;
     this.g = null;
+    this.activemenu = false;
     this.__clear__();
   },
   
@@ -17,7 +18,21 @@ output = {
     this.__calibrate__({'pathlist':this.__calibration__.pathlist});
   },
   
+  active_widget: function(val) {
+    this.activemenu = val.active;
+  },
+
   __init__:function() {
+    if (this.__collection__.scenario() == '--') {
+      this.__collection__.upsert({
+        '#tag':'input',
+        '@name':'pathmakeractive',
+        'callback':'active_widget',
+        'input_type':'togglebar',
+        'label':'PathMaker'
+      });
+    }
+
     if (!this.__calibration__.pathlist.hasOwnProperty('paths')) {
       this.__calibration__.pathlist = {paths:[]};
       this.update();
@@ -151,8 +166,8 @@ output = {
     poly.attr('points', newPoints);
   },
   
-  __mouseUp__:function(self, activemenu) {
-    if (!activemenu) return;
+  __mouseUp__:function(self) {
+    if (!this.activemenu) return;
     if (this.dragging) return;
     var xS = d3.mouse(self)[0]
     var yS = d3.mouse(self)[1];
@@ -191,8 +206,8 @@ output = {
     this.draw();
   },
   
-  __mouseMove__:function(self, activemenu) {
-    if (!activemenu) return;
+  __mouseMove__:function(self) {
+    if (!this.activemenu) return;
     if (this.drawing < 0 || !d3.event.shiftKey) return;
     this.g.select('line').remove();
     var v = this.__calibration__.pathlist.paths[this.drawing].vertices;
@@ -206,8 +221,8 @@ output = {
       .attr('stroke-width', 1);      
   },
   
-  __keyUp__:function(self, activemenu) {
-    if (!activemenu) return;
+  __keyUp__:function(self) {
+    if (!this.activemenu) return;
     var key = d3.event.keyCode;
     if (key==16) {
       if (this.drawing>=0 && this.__calibration__.pathlist.paths[this.drawing].vertices.length < 2) {

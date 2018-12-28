@@ -16,12 +16,20 @@ output = {
     this.xScale = null;
     this.yScale = null;
     this.drag = null;
+    this.activemenu = false;
     this.g = null;
     this.__clear__();
   },
-    
-  __init__:function() {
 
+  export_map: function(val,doc) {
+    vy.save_scrap(val,'NateBu:Base:Mapx',this.__calibration__.map,null);
+  },
+  
+  active_widget: function(val) {
+    this.activemenu = val.active;
+  },
+  
+  __init__:function() {
     // Make sure shapes have unique string ids
     var replace = false;
     var idlist = [];
@@ -33,6 +41,24 @@ output = {
       idlist.push(shape.id);
     });
   
+    if (this.__collection__.scenario() == '--') {
+      this.__collection__.upsert({
+        '#tag':'input',
+        '@name':'exportscrapmap',
+        'value':'NateBu:ASITest:map',
+        'callback':'export_map',
+        'input_type':'text',
+        'label':'Map scrap name'
+      });
+      this.__collection__.upsert({
+        '#tag':'input',
+        '@name':'mapmakeractive',
+        'callback':'active_widget',
+        'input_type':'togglebar',
+        'label':'MapMaker'
+      });
+    }
+
     if (replace) this.update();
     this.draw();
   },
@@ -219,8 +245,8 @@ output = {
     poly.attr('points', newPoints);
   },
   
-  __mouseUp__:function(self, activemenu) {
-    if (!activemenu) return;
+  __mouseUp__:function(self) {
+    if (!this.activemenu) return;
     if (this.dragging) return;
     var xy = {x:d3.mouse(self)[0], y:d3.mouse(self)[1]};
     var xG = this.xScale.invert(xy.x);
@@ -248,8 +274,8 @@ output = {
     }
   },
   
-  __mouseMove__:function(self, activemenu) {
-    if (!activemenu) return;
+  __mouseMove__:function(self) {
+    if (!this.activemenu) return;
     if(!this.drawing) return;
     this.g.select('line').remove();
     this.g.append('line')
@@ -261,8 +287,8 @@ output = {
       .attr('stroke-width', 1);      
   },
   
-  __keyUp__:function(self, activemenu) {
-    if (!activemenu) return;
+  __keyUp__:function(self) {
+    if (!this.activemenu) return;
     var key = d3.event.keyCode;
     if (key==40 && this.editing >= 0) { // down arrow
       var idx = this.order.indexOf(this.editing);

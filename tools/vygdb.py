@@ -285,10 +285,10 @@ def parse_sources(replace_paths=[]):
 
       delimiter = re.compile('(?s)<vygdb(.*?)vygdb>')
       try:
-        with open(filename, 'r') as file:
+        with open(filename, 'r', encoding='utf-8') as file:
           vyscripts += delimiter.findall(file.read())
-
-        with open(filename, 'r') as file:
+        
+        with open(filename, 'r', encoding='utf-8') as file:
           for (i, line) in enumerate(file):
             for mtch in delimiter.findall(line):
               try:
@@ -304,7 +304,7 @@ def parse_sources(replace_paths=[]):
                 print('  vygdb.parse_sources: Could not process potential debug point in '+filename+' at line '+str(i)+':\n'+line,exc)
                 sys.stdout.flush()
       except Exception as exc:
-        print('  vygdb.parse_sources: collection warning, failed reading of '+filename+':',exc)
+        print('  vygdb.parse_sources: warning, failed reading of '+filename+':',exc)
         sys.stdout.flush()
   
   vyscripts_filter_breakpoints = []
@@ -365,7 +365,7 @@ def latest_position(sock, lastfile):
     if x is not None and x.is_valid() and x.symtab.is_valid():
       currentfile = x.symtab.filename
       if currentfile is not lastfile:
-        with open(currentfile,'r') as cf:
+        with open(currentfile, 'r', encoding='utf-8') as cf:
           sock.send({'vygdb_current':{'line':x.line,'filename':currentfile,'file':cf.read(),'job':os.environ['VYJOB']}})
       else:
         sock.send({'vygdb_current':{'line':x.line,'job':os.environ['VYJOB']}})
