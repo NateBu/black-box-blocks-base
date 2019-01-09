@@ -1,0 +1,7 @@
+{
+  "#thingtype": "stage",
+  "from": "ubuntu:18.04",
+  "name": "@@:Base:Ros2Crystal",
+  "society": [],
+  "text": "RUN apt update && apt-get install -y locales\nRUN locale-gen en_US en_US.UTF-8\nRUN update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8\nRUN export LANG=en_US.UTF-8\nRUN apt update && apt install -y curl gnupg2 lsb-release\nRUN curl http://repo.ros2.org/repos.key | apt-key add -\nRUN sh -c 'echo \"deb [arch=amd64,arm64] http://packages.ros.org/ros2/ubuntu `lsb_release -cs` main\" > /etc/apt/sources.list.d/ros2-latest.list'\nENV CHOOSE_ROS_DISTRO crystal\nRUN apt update\nENV DEBIAN_FRONTEND noninteractive\nRUN apt install -y ros-$CHOOSE_ROS_DISTRO-desktop\nRUN apt install -y python3-pip\nRUN pip3 install argcomplete"
+}

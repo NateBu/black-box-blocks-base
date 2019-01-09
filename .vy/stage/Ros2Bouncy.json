@@ -1,7 +1,0 @@
-{
-  "#thingtype": "stage",
-  "from": "ubuntu:xenial",
-  "name": "@@:Base:Ros2Bouncy",
-  "society": [],
-  "text": "RUN apt update && apt install -y curl\nRUN curl http://repo.ros2.org/repos.key | apt-key add -\nRUN apt install -y lsb-release\nRUN sh -c 'echo \"deb [arch=amd64,arm64] http://repo.ros2.org/ubuntu/main `lsb_release -cs` main\" > /etc/apt/sources.list.d/ros2-latest.list'\nENV ROS_DISTRO=bouncy\n# bouncy not working\nRUN cat /etc/apt/sources.list.d/ros2-latest.list\nRUN apt update && apt install -y ros-$ROS_DISTRO-ros-base  #bare-bones\n# RUN apt update && apt install -y ros-$ROS_DISTRO-desktop  #goodies\nRUN apt install -y ros-$ROS_DISTRO-ament-tools"
-}

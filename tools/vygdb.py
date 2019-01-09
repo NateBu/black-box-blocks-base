@@ -140,7 +140,7 @@ def marshal(variable):
       x = marshal(variable['_M_ptr'].referenced_value())
     elif typ.code == gdb.TYPE_CODE_VOID:
       x = None
-    elif vtype.find("const std::vector") == 0 or vtype.find("std::vector") == 0:
+    elif vtype.find("const std::vector") == 0 or vtype.find("std::vector") == 0 or vtype.find("const std::deque") == 0 or vtype.find("std::deque") == 0:
       x = _vector(variable)
     elif vtype.find("const std::tuple") == 0 or vtype.find("std::tuple") == 0:
       x = _tuple(variable)
@@ -298,7 +298,7 @@ def parse_sources(replace_paths=[]):
                   cmd['active'] = False # Always default to false
                 for c in VYGDB['BREAKPOINTS']:
                   if cmd['source']==c['source']:
-                    raise ParseSourceException("Duplicate source breakpoint")
+                    raise ParseSourceException('Duplicate source breakpoint "'+c['source']+'"')
                 VYGDB['BREAKPOINTS'].append(cmd)
               except Exception as exc:
                 print('  vygdb.parse_sources: Could not process potential debug point in '+filename+' at line '+str(i)+':\n'+line,exc)
