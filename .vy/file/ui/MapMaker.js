@@ -1,6 +1,6 @@
 output = {
   __clear__:function() {
-    this.points = [];       // Points on unclosed polygon
+    this.points = [];     // Points on unclosed polygon
     this.order = [];
     this.draw();
   },
