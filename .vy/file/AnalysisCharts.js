@@ -4,9 +4,9 @@ var colors = [
   'rgba(255,0,0,:)',
   'rgba(0,255,255,:)',
   'rgba(255,127,0,:)',
-  'rgba(200,255,0,:)',
   'rgba(127,0,255,:)',
   'rgba(255,0,255,:)',
+  'rgba(200,255,0,:)',
   'rgba(150,150,150,:)',
   'rgba(0,0,0,:)'];
 
@@ -51,7 +51,7 @@ var add_data = function(chart, setlabel, dataid, datalabel, fill, data) {
   chart.data.datasets[set_indx].data[data_indx] = data;
 };
 
-var analysis_chart_ = function(yaxislabel, dataloc, rslt, charttype) {
+var analysis_chart_ = function(yaxislabel, metric, rslt, charttype) {
   var fill = charttype == 'bar';
   var chart = {
     type:charttype, 
@@ -71,7 +71,7 @@ var analysis_chart_ = function(yaxislabel, dataloc, rslt, charttype) {
   
   var baseidx = get_dataset_index(chart, 'Base', fill);
   rslt.forEach(function(x) {
-    var value = dataloc.split('.').reduce((o,i)=>(o&&o.hasOwnProperty(i))?o[i]:null, x);
+    var value = metric(x); //dataloc.split('.').reduce((o,i)=>(o&&o.hasOwnProperty(i))?o[i]:null, x);
     if (x.regression.id == "-") {
       chart.data.ids.push(x._id);
       chart.data.labels.push(x.name);
@@ -80,10 +80,10 @@ var analysis_chart_ = function(yaxislabel, dataloc, rslt, charttype) {
   });
   
   rslt.forEach(function(x) {
-    var value = dataloc.split('.').reduce((o,i)=>(o&&o.hasOwnProperty(i))?o[i]:null, x);
+    var value = metric(x); //dataloc.split('.').reduce((o,i)=>(o&&o.hasOwnProperty(i))?o[i]:null, x);
     if (x.regression.id !== "-") {
       var xb = new Date(x.regression.timestamp);
-      var lbl = xb.toLocaleDateString() + ' ' + xb.toLocaleTimeString();
+      var lbl = x.regression.reglabel; //xb.toLocaleDateString() + ' ' + xb.toLocaleTimeString();
       add_data(chart, lbl, x.regression.id, x.name, fill, value);
     }
   });
@@ -91,13 +91,13 @@ var analysis_chart_ = function(yaxislabel, dataloc, rslt, charttype) {
   return chart;
 }
 
-analysis_chart = function(self, query, plotdata, db) {
+analysis_chart = function(self, query, fields, plotdata, db) {
   var callback = function(err, rslt) {
     if (!err) {
       
       plotdata.forEach(function(x) {
-        var chart = analysis_chart_(x.name, x.location, rslt, 'bar');
-        var id = x.location.replace(/\./g,'');
+        var chart = analysis_chart_(x.name, x.metric, rslt, 'bar');
+        var id = x.name.replace(/[\W]+/g,"_"); // replace non-alphanumeric
         
         chart.data.labels = chart.data.labels.map(function (l) {
           return l.split(':').pop();
@@ -111,10 +111,8 @@ analysis_chart = function(self, query, plotdata, db) {
       });
     }
   };
-  var fields = {name:1,regression:1};
-  plotdata.forEach(function(x) {
-    fields[x.location] = 1;
-  });
+  fields.name = 1;
+  fields.regression = 1;
   vy.fetch('scenario', query, {fields:fields}, callback);
 };
 

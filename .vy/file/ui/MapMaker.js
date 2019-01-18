@@ -33,6 +33,7 @@ output = {
     // Make sure shapes have unique string ids
     var replace = false;
     var idlist = [];
+    if (!this.__calibration__.map) return;
     this.__calibration__.map.shapes.forEach(function(shape) {
       if (typeof(shape.id)==="number" || idlist.indexOf(shape.id) > -1) {
         replace = true;
@@ -40,7 +41,7 @@ output = {
       }
       idlist.push(shape.id);
     });
-  
+
     if (this.__collection__.scenario() == '--') {
       this.__collection__.upsert({
         '#tag':'input',

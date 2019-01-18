@@ -9,11 +9,9 @@ sinesurface = function(seed,gridd,maxamp,nfacets) {
     var psi = Math.PI*Math.random();
     waves.push({'amplitude':amp,'wavelength':wvl,'azimuth':phi,'phase':psi});
   }
-  //waves = [[0.0,10.0,Math.PI/2.0,0.1]]
-  
-  var vertices = [];
-  var facets = [];
-  
+
+
+  var geometry = new THREE.Geometry();
   var height = function(x, y) {
     var ztarget = 0;
     for (ii = 0; ii < waves.length; ii++) {
@@ -65,25 +63,21 @@ sinesurface = function(seed,gridd,maxamp,nfacets) {
       var x = xmin + c*xspc;
       var y = ymin + r*yspc;
       var z = height(x,y);
-      vertices.push( [x, y, z] );
+      geometry.vertices.push( new THREE.Vector3(x,y,z) );
       if (c<cols && r<rows) {
         var f0 = (r)    *(cols+1) + (c) + 1;
         var f1 = (r + 1)*(cols+1) + (c) + 1;
         var f2 = (r + 1)*(cols+1) + (c);
-        facets.push([f0, f1, f2]);
+        geometry.faces.push( new THREE.Face3( f0, f1, f2 ) );
         f0 = (r + 1)*(cols+1) + (c);
         f1 = (r)    *(cols+1) + (c);
         f2 = (r)    *(cols+1) + (c) + 1;
-        facets.push([f0, f1, f2]);
+        geometry.faces.push( new THREE.Face3( f0, f1, f2 ) );
       }
     }
   }
-  // 0.781346917786, -0.003739250431392, 1.614568446468,
-  // data.waves = height(0.7813,-.0037); //0.42078
-  return {
-    waves:waves,
-    vertices:vertices,
-    facets:facets,
-    surface_derivatives:surface_derivatives
-  };
+  
+
+
+  return {waves:waves, geometry:geometry, surface_derivatives:surface_derivatives};
 };
