@@ -45,7 +45,7 @@ output = {
     if (this.__collection__.scenario() == '--') {
       this.__collection__.upsert({
         '#tag':'input',
-        '@name':'exportscrapmap',
+        'name':'exportscrapmap',
         'value':'NateBu:ASITest:map',
         'callback':'export_map',
         'input_type':'text',
@@ -53,7 +53,7 @@ output = {
       });
       this.__collection__.upsert({
         '#tag':'input',
-        '@name':'mapmakeractive',
+        'name':'mapmakeractive',
         'callback':'active_widget',
         'input_type':'togglebar',
         'label':'MapMaker'

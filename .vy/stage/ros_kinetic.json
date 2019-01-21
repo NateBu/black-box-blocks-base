@@ -1,5 +1,6 @@
 {
   "#thingtype": "stage",
+  "explicitbuild": false,
   "from": "ubuntu:xenial",
   "name": "@@:Base:ros_kinetic",
   "society": [],

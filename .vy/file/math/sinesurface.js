@@ -77,7 +77,5 @@ sinesurface = function(seed,gridd,maxamp,nfacets) {
     }
   }
   
-
-
   return {waves:waves, geometry:geometry, surface_derivatives:surface_derivatives};
 };

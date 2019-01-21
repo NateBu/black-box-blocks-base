@@ -1,5 +1,6 @@
 {
   "#thingtype": "stage",
+  "explicitbuild": false,
   "from": "@@:Base:Ros2Crystal",
   "name": "@@:Base:gdbros2",
   "society": [],

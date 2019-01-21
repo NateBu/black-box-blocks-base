@@ -26,7 +26,7 @@ output = {
     if (this.__collection__.scenario() == '--') {
       this.__collection__.upsert({
         '#tag':'input',
-        '@name':'pathmakeractive',
+        'name':'pathmakeractive',
         'callback':'active_widget',
         'input_type':'togglebar',
         'label':'PathMaker'

@@ -106,7 +106,7 @@ analysis_chart = function(self, query, fields, plotdata, db) {
         db.insert({
           '#tag':'analysis',
           type:'chart',
-          '@name':id,
+          'name':id,
           'data':chart});
       });
     }
@@ -178,5 +178,5 @@ line_chart = function(chart_label, x_, ylist, db) {
       }
     }
   };
-  db.upsert({'#tag':'analysis', type:'chart', '@name':chart_label,'data':chart});
+  db.upsert({'#tag':'analysis', type:'chart', 'name':chart_label,'data':chart});
 };

@@ -1,5 +1,6 @@
 {
   "#thingtype": "stage",
+  "explicitbuild": false,
   "from": "ubuntu:18.04",
   "name": "@@:Base:Ros2Crystal",
   "society": [],
