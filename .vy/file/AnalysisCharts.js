@@ -71,7 +71,10 @@ var analysis_chart_ = function(yaxislabel, metric, rslt, charttype) {
   
   var baseidx = get_dataset_index(chart, 'Base', fill);
   rslt.forEach(function(x) {
-    var value = metric(x); //dataloc.split('.').reduce((o,i)=>(o&&o.hasOwnProperty(i))?o[i]:null, x);
+    var value = null;  //dataloc.split('.').reduce((o,i)=>(o&&o.hasOwnProperty(i))?o[i]:null, x);
+    try { value = metric(x) } catch(err) {
+      console.log('Failed to analyze metric for '+x.name);      
+    };
     if (x.regression.id == "-") {
       chart.data.ids.push(x._id);
       chart.data.labels.push(x.name);
@@ -80,7 +83,10 @@ var analysis_chart_ = function(yaxislabel, metric, rslt, charttype) {
   });
   
   rslt.forEach(function(x) {
-    var value = metric(x); //dataloc.split('.').reduce((o,i)=>(o&&o.hasOwnProperty(i))?o[i]:null, x);
+    var value = null; //dataloc.split('.').reduce((o,i)=>(o&&o.hasOwnProperty(i))?o[i]:null, x);
+    try { value = metric(x) } catch(err) {
+      console.log('Failed to analyze metric for '+x.name);      
+    };
     if (x.regression.id !== "-") {
       var xb = new Date(x.regression.timestamp);
       var lbl = x.regression.reglabel; //xb.toLocaleDateString() + ' ' + xb.toLocaleTimeString();

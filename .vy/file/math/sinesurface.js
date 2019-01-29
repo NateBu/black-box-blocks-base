@@ -10,8 +10,6 @@ sinesurface = function(seed,gridd,maxamp,nfacets) {
     waves.push({'amplitude':amp,'wavelength':wvl,'azimuth':phi,'phase':psi});
   }
 
-
-  var geometry = new THREE.Geometry();
   var height = function(x, y) {
     var ztarget = 0;
     for (ii = 0; ii < waves.length; ii++) {
@@ -51,6 +49,7 @@ sinesurface = function(seed,gridd,maxamp,nfacets) {
     return {z:z,dzdx:dzdx,dzdy:dzdy};
   };
   
+  var geometry = new THREE.Geometry();
   var d = gridd;
   var n = Math.max(2,Math.min(200,nfacets));
   var xmax = d, xmin = -d, ymax = d, ymin = -d;
