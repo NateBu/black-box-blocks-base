@@ -9,7 +9,9 @@
  * @param   {number}  l       The lightness
  * @return  {Array}           The RGB representation
  */
-hsl_to_rgb = function(h, s, l){
+(function() {
+   
+  hsl_to_rgb = function(h, s, l){
     var r, g, b;
     if(s === 0){
         r = g = b = l; // achromatic
@@ -30,9 +32,16 @@ hsl_to_rgb = function(h, s, l){
         b = hue2rgb(p, q, h - 1/3);
     }
     return [r,g,b];
-};
+  };
 
-hsl_to_color = function(h, s, l) {
-  v = hsl_to_rgb(h,s,l);
-  return 'rgb('+Math.floor(v[0]*255)+','+Math.floor(v[1]*255)+','+Math.floor(v[2]*255)+')';
-}
+  hsl_to_color = function(h, s, l) {
+    v = hsl_to_rgb(h,s,l);
+    return 'rgb('+Math.floor(v[0]*255)+','+Math.floor(v[1]*255)+','+Math.floor(v[2]*255)+')';
+  };
+  
+  return {
+    hsl_to_rgb:hsl_to_rgb,
+    hsl_to_color:hsl_to_color
+  };
+ 
+})();

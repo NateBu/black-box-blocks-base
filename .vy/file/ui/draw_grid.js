@@ -1,4 +1,5 @@
-draw_new_grid = function(grid,g,xscale,yscale,redraw) {
+(function() {
+  let draw_new_grid = function(grid,g,xscale,yscale,redraw) {
   
     var thisgrid = g.selectAll('image');
     var w = Math.abs(xscale(grid.info.resolution*grid.info.width_cells) - xscale(0));
@@ -25,3 +26,6 @@ draw_new_grid = function(grid,g,xscale,yscale,redraw) {
     }*/
 
 }
+  
+  return {draw_new_grid:draw_new_grid};
+});
