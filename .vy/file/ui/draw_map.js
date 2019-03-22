@@ -31,7 +31,7 @@
   }
   
   return {draw_new_map:draw_new_map};
-});
+})();
   
   /*
       var self = this;
