@@ -6,6 +6,6 @@
       area += (vertices[ii].x*vertices[jj].y - vertices[jj].x*vertices[ii].y);
     }
     return area/2;
-  };  
+  };
   return {signed_area:signed_area};
-})
+})();
