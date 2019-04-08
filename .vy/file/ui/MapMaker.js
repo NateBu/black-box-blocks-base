@@ -1,4 +1,6 @@
-output = {
+output = (function() {
+  
+var x = {
   __clear__:function() {
     this.points = []; // Points on unclosed polygon
     this.order = [];
@@ -67,19 +69,6 @@ output = {
   update:function() {
     this.__publishers__.publish_map(this.__calibration__.map);
     this.__calibrate__({"map":this.__calibration__.map});
-  },
-  
-  __d3init__:function(d3p) {
-    this.xScale = d3p.xScale;
-    this.yScale = d3p.yScale;
-    var thisx = this;
-    this.drag = d3.behavior.drag().on("drag", function(d,i) {
-      thisx.handleDrag_points(this);
-    }).on('dragend', function(d){
-      thisx.handleDragEnd_points(this);
-    });
-    this.g = d3p.g;
-    this.draw();
   },
   
   onsegment:function(p, v, w, thresh) {
@@ -246,7 +235,7 @@ output = {
     poly.attr('points', newPoints);
   },
   
-  __mouseUp__:function(self) {
+  mouseup:function(self) {
     if (!this.activemenu) return;
     if (this.dragging) return;
     var xy = {x:d3.mouse(self)[0], y:d3.mouse(self)[1]};
@@ -275,7 +264,7 @@ output = {
     }
   },
   
-  __mouseMove__:function(self) {
+  mousemove:function(self) {
     if (!this.activemenu) return;
     if(!this.drawing) return;
     this.g.select('line').remove();
@@ -288,7 +277,7 @@ output = {
       .attr('stroke-width', 1);      
   },
   
-  __keyUp__:function(self) {
+  keyup:function(self) {
     if (!this.activemenu) return;
     var key = d3.event.keyCode;
     if (key==40 && this.editing >= 0) { // down arrow
@@ -332,7 +321,31 @@ output = {
     this.draw();
   },
   
-  __zoom__:function(self) {
-    this.draw();
-  }
 };
+
+vy.d3.register('draw', 'mapmaker_draw', function(d3p) {
+  if (!x.g) {
+    x.drag = d3.behavior.drag().on("drag", function(d,i) {
+      x.handleDrag_points(this);
+    }).on('dragend', function(d){
+      x.handleDragEnd_points(this);
+    });
+  }
+  x.g = d3p.g;
+  x.xScale = d3p.xScale;
+  x.yScale = d3p.yScale;
+  x.draw();
+});
+vy.d3.register('keyup', 'mapmaker_keyup', function(self) {
+  x.keyup(self);
+});
+vy.d3.register('mousemove', 'mapmaker_mousemove', function(self) {
+  x.mousemove(self);
+});
+vy.d3.register('mouseup', 'mapmaker_mouseup', function(self) {
+  x.mouseup(self);
+});
+
+return x;
+
+})();
