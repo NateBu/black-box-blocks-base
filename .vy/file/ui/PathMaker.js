@@ -1,8 +1,6 @@
-output = {
-  __clear__: function() {
-  },
-  
-  __constructor__:function() {
+var pathobj = {
+  clear:function() {
+    this.pathlist = null;
     this.radius = 6;
     this.dragging = false;
     this.drawing = -1;
@@ -11,49 +9,16 @@ output = {
     this.drag = null;
     this.g = null;
     this.activemenu = false;
-    this.__clear__();
   },
   
   update:function() {
-    this.__calibrate__({'pathlist':this.__calibration__.pathlist});
+    vy.calibrate({'pathlist':this.pathlist});
   },
   
   active_widget: function(val) {
     this.activemenu = val.active;
   },
 
-  __init__:function() {
-    if (this.__collection__.scenario() == '--') {
-      this.__collection__.upsert({
-        '#tag':'input',
-        'name':'pathmakeractive',
-        'callback':'active_widget',
-        'input_type':'togglebar',
-        'label':'PathMaker'
-      });
-    }
-
-    if (!this.__calibration__.pathlist.hasOwnProperty('paths')) {
-      this.__calibration__.pathlist = {paths:[]};
-      this.update();
-    } else {
-      this.draw();
-    }
-  },
-  
-  __d3init__:function(d3p) {
-    this.xScale = d3p.xScale;
-    this.yScale = d3p.yScale;
-    var self = this;
-    this.drag = d3.behavior.drag().on("drag", function(d,i) {
-      self.handleDrag_points(this);
-    }).on('dragend', function(d){
-      self.handleDragEnd_points(this);
-    });
-    this.g = d3p.g;
-    this.draw();
-  },
-  
   onsegment:function(p, v, w, thresh) {
     function sqr(x) { return x * x }
     function dist2(v, w) { return sqr(v.x - w.x) + sqr(v.y - w.y) }
@@ -86,9 +51,9 @@ output = {
         d3.select(this).remove();       // Remove the circle handle
         path.vertices.splice(i,1);      // Remove point from vertices
         if (path.vertices.length<2) {   // Remove the whole path
-          for (var i = self.__calibration__.pathlist.paths.length-1; i>=0; i--) {
-            if (self.__calibration__.pathlist.paths[i].vertices.length < 2) {
-              self.__calibration__.pathlist.paths.splice(i,1);
+          for (var i = self.pathlist.paths.length-1; i>=0; i--) {
+            if (self.pathlist.paths[i].vertices.length < 2) {
+              self.pathlist.paths.splice(i,1);
               self.update()
             }
           }
@@ -101,12 +66,12 @@ output = {
   },
   
   draw:function() {
-    if (this.g === null || !this.hasOwnProperty('__calibration__')) return;
+    if (this.g === null || !this.pathlist) return;
     var self = this;
     this.g.select('line').remove();
     this.g.selectAll('g.path').remove();
-    for (var j = 0; j < this.__calibration__.pathlist.paths.length; j++) {
-      var path = this.__calibration__.pathlist.paths[j];
+    for (var j = 0; j < this.pathlist.paths.length; j++) {
+      var path = this.pathlist.paths[j];
       var color = this.pathColor(path);
       this.g.selectAll('g.path_id'+path.id).remove();
       var g = this.g.append('g')
@@ -153,11 +118,11 @@ output = {
       var x_ = circle.attr('cx');
       var y_ = circle.attr('cy');
       if ((x_===x && y_===y)) {
-        this.__calibration__.pathlist.paths[idx].vertices[i] = {x:this.xScale.invert(x_),y:this.yScale.invert(y_)};
+        this.pathlist.paths[idx].vertices[i] = {x:this.xScale.invert(x_),y:this.yScale.invert(y_)};
       } else if (d3.event.sourceEvent.shiftKey) {
         x_ = parseInt(x_) + d3.event.dx;
         y_ = parseInt(y_) + d3.event.dy;
-        this.__calibration__.pathlist.paths[idx].vertices[i] = {x:this.xScale.invert(x_),y:this.yScale.invert(y_)};
+        this.pathlist.paths[idx].vertices[i] = {x:this.xScale.invert(x_),y:this.yScale.invert(y_)};
         circle.attr('cx', x_);
         circle.attr('cy', y_);
       }
@@ -166,7 +131,7 @@ output = {
     poly.attr('points', newPoints);
   },
   
-  __mouseUp__:function(self) {
+  mouseup:function(self) {
     if (!this.activemenu) return;
     if (this.dragging) return;
     var xS = d3.mouse(self)[0]
@@ -174,16 +139,16 @@ output = {
     var xG = this.xScale.invert(xS);
     var yG = this.yScale.invert(yS)
     if (!d3.event.shiftKey) {
-      for (var i = this.__calibration__.pathlist.paths.length-1; i>=0; i--) {
-        var n = this.__calibration__.pathlist.paths[i].vertices.length;
+      for (var i = this.pathlist.paths.length-1; i>=0; i--) {
+        var n = this.pathlist.paths[i].vertices.length;
         for (var j = 1; j < n; j++) {
-          var p0 = this.__calibration__.pathlist.paths[i].vertices[j-1];
-          var p1 = this.__calibration__.pathlist.paths[i].vertices[j];
+          var p0 = this.pathlist.paths[i].vertices[j-1];
+          var p1 = this.pathlist.paths[i].vertices[j];
           p0 = {x:this.xScale(p0.x),y:this.yScale(p0.y)};
           p1 = {x:this.xScale(p1.x),y:this.yScale(p1.y)};
           if (this.onsegment({x:xS,y:yS}, p0, p1, this.radius)) { // in screen coordinates
             if (this.drawing === i) {
-              this.__calibration__.pathlist.paths[i].vertices.splice(j,0,{x:xG,y:yG});
+              this.pathlist.paths[i].vertices.splice(j,0,{x:xG,y:yG});
             } else {
               this.drawing = i;
             }
@@ -195,22 +160,22 @@ output = {
       }
     } else {
       if (this.drawing === -1) {
-        this.drawing = this.__calibration__.pathlist.paths.length;
+        this.drawing = this.pathlist.paths.length;
         var id = math.random().toString(36).slice(2);
-        this.__calibration__.pathlist.paths.push({'id':id,'vertices':[{x:xG,y:yG}]});
+        this.pathlist.paths.push({'id':id,'vertices':[{x:xG,y:yG}]});
       } else {
-        this.__calibration__.pathlist.paths[this.drawing].vertices.push({x:xG,y:yG});
+        this.pathlist.paths[this.drawing].vertices.push({x:xG,y:yG});
       }
       this.update();
     }
     this.draw();
   },
   
-  __mouseMove__:function(self) {
+  mousemove:function(self) {
     if (!this.activemenu) return;
     if (this.drawing < 0 || !d3.event.shiftKey) return;
     this.g.select('line').remove();
-    var v = this.__calibration__.pathlist.paths[this.drawing].vertices;
+    var v = this.pathlist.paths[this.drawing].vertices;
     var p = v[v.length-1];
     this.g.append('line')
       .attr('x1', this.xScale(p.x))
@@ -221,12 +186,12 @@ output = {
       .attr('stroke-width', 1);      
   },
   
-  __keyUp__:function(self) {
+  keyup:function(self) {
     if (!this.activemenu) return;
     var key = d3.event.keyCode;
     if (key==16) {
-      if (this.drawing>=0 && this.__calibration__.pathlist.paths[this.drawing].vertices.length < 2) {
-        this.__calibration__.pathlist.paths.splice(this.drawing,1);
+      if (this.drawing>=0 && this.pathlist.paths[this.drawing].vertices.length < 2) {
+        this.pathlist.paths.splice(this.drawing,1);
         this.update();
       }
       this.drawing = -1;
@@ -236,10 +201,55 @@ output = {
   
   path_request:function(msg) {
     this.update();
-    this.__publishers__.path_response(this.__calibration__.pathlist);
+    vy.publish('path_response', this.pathlist);
   },
   
-  __zoom__:function(self) {
-    this.draw();
+};
+
+pathobj.clear();
+
+vy.db.upsert({
+  '#tag':'input',
+  'name':'pathmakeractive',
+  'callback':'active_widget',
+  'input_type':'togglebar',
+  'label':'PathMaker'
+});
+
+vy.register_callback('calibration','pathlist', function(pathlist) {
+  pathobj.pathlist = pathlist;
+  /*
+    if (!this.pathlist.hasOwnProperty('paths')) {
+      this.pathlist = {paths:[]};
+      this.update();
+    } else {
+      this.draw();
+    }
+  */
+});
+
+vy.register_callback('d3_draw', 'pathmaker_draw', function(d3p) {
+  if (!pathobj.g) {
+    pathobj.drag = d3.behavior.drag().on("drag", function(d,i) {
+      pathobj.handleDrag_points(this);
+    }).on('dragend', function(d){
+      pathobj.handleDragEnd_points(this);
+    });
   }
-}
+  pathobj.g = d3p.g;
+  pathobj.xScale = d3p.xScale;
+  pathobj.yScale = d3p.yScale;
+  pathobj.draw();
+});
+
+vy.register_callback('d3_keyup', 'pathmaker_keyup', function(self) {
+  pathobj.keyup(self);
+});
+
+vy.register_callback('d3_mousemove', 'pathmaker_mousemove', function(self) {
+  pathobj.mousemove(self);
+});
+
+vy.register_callback('d3_mouseup', 'pathmaker_mouseup', function(self) {
+  pathobj.mouseup(self);
+});

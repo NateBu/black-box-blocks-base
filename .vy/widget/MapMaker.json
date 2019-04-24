@@ -26,10 +26,12 @@
   "share": [
     {
       "name": "polygon_area",
+      "secret": false,
       "type": "file::@@:Base:ui/polygon_area.js"
     },
     {
       "name": "--",
+      "secret": false,
       "type": "file::@@:Base:ui/MapMaker.js"
     }
   ],

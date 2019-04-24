@@ -1,13 +1,9 @@
-output = (function() {
-  
-var x = {
-  __clear__:function() {
+var mapobj = {
+  clear:function() {
     this.points = []; // Points on unclosed polygon
     this.order = [];
+    this.calibration = {map:null};
     this.draw();
-  },
-  
-  __constructor__:function() {
     this.radius = 6;
     this.color = {'obstacle':'#c83232','drivable':'#3264c8','reference':'green'};
     this.dragging = false;
@@ -20,55 +16,19 @@ var x = {
     this.drag = null;
     this.activemenu = false;
     this.g = null;
-    this.__clear__();
   },
 
   export_map: function(val,doc) {
-    vy.save_scrap(val,'NateBu:Base:Mapx',this.__calibration__.map,null);
+    vy.save_scrap(val,'NateBu:Base:Mapx',this.calibration.map,null);
   },
   
   active_widget: function(val) {
     this.activemenu = val.active;
   },
   
-  __init__:function() {
-    // Make sure shapes have unique string ids
-    var replace = false;
-    var idlist = [];
-    if (!this.__calibration__.map) return;
-    this.__calibration__.map.shapes.forEach(function(shape) {
-      if (typeof(shape.id)==="number" || idlist.indexOf(shape.id) > -1) {
-        replace = true;
-        shape.id = math.random().toString(36).slice(2);
-      }
-      idlist.push(shape.id);
-    });
-
-    if (this.__collection__.scenario() == '--') {
-      this.__collection__.upsert({
-        '#tag':'input',
-        'name':'exportscrapmap',
-        'value':'NateBu:ASITest:map',
-        'callback':'export_map',
-        'input_type':'text',
-        'label':'Map scrap name'
-      });
-      this.__collection__.upsert({
-        '#tag':'input',
-        'name':'mapmakeractive',
-        'callback':'active_widget',
-        'input_type':'togglebar',
-        'label':'MapMaker'
-      });
-    }
-
-    if (replace) this.update();
-    this.draw();
-  },
-  
   update:function() {
-    this.__publishers__.publish_map(this.__calibration__.map);
-    this.__calibrate__({"map":this.__calibration__.map});
+    vy.publish('publish_map',this.calibration.map);
+    vy.calibrate({"map":this.calibration.map});
   },
   
   onsegment:function(p, v, w, thresh) {
@@ -89,9 +49,9 @@ var x = {
   
   drawpoly:function(idx) {
     var self = this;
-    if (idx >= this.__calibration__.map.shapes.length || idx < 0)
+    if (idx >= this.calibration.map.shapes.length || idx < 0)
       return;
-    var poly = this.__calibration__.map.shapes[idx];
+    var poly = this.calibration.map.shapes[idx];
 
     var color = this.polygonColor(poly);
     
@@ -139,9 +99,9 @@ var x = {
           d3.select(this).remove();       // Remove the circle handle
           poly.vertices.splice(i,1);      // Remove point from vertices
           if (poly.vertices.length<3) {   // Remove the whole polygon
-            for (var i = self.__calibration__.map.shapes.length-1; i>=0; i--) {
-              if (self.__calibration__.map.shapes[i].vertices.length < 3) {
-                self.__calibration__.map.shapes.splice(i,1);
+            for (var i = self.calibration.map.shapes.length-1; i>=0; i--) {
+              if (self.calibration.map.shapes[i].vertices.length < 3) {
+                self.calibration.map.shapes.splice(i,1);
               }
             }
             g.remove();
@@ -177,12 +137,12 @@ var x = {
   
   draw:function() {
     // Draw unfinished polygon
-    if (this.g ===  null || !this.hasOwnProperty('__calibration__')) return;
+    if (this.g ===  null || !this.calibration.map) return;
     this.drawunfinished();
 
     // Draw all finished polygons
     this.g.selectAll('g.shape').remove();
-    var ns = this.__calibration__.map.shapes.length;
+    var ns = this.calibration.map.shapes.length;
     if (this.order.length != ns) {
       this.order = [];
       for (var ii=0; ii<ns; ii++) {
@@ -222,11 +182,11 @@ var x = {
       var x_ = circle.attr('cx');
       var y_ = circle.attr('cy');
       if ((x_===x && y_===y)) {
-        this.__calibration__.map.shapes[idx].vertices[i] = {x:this.xScale.invert(x_), y:this.yScale.invert(y_)};
+        this.calibration.map.shapes[idx].vertices[i] = {x:this.xScale.invert(x_), y:this.yScale.invert(y_)};
       } else if (d3.event.sourceEvent.shiftKey) {
         x_ = parseInt(x_)+d3.event.dx;
         y_ = parseInt(y_)+d3.event.dy;
-        this.__calibration__.map.shapes[idx].vertices[i] = {x:this.xScale.invert(x_),y:this.yScale.invert(y_)};
+        this.calibration.map.shapes[idx].vertices[i] = {x:this.xScale.invert(x_),y:this.yScale.invert(y_)};
         circle.attr('cx', x_);
         circle.attr('cy', y_);
       }
@@ -241,16 +201,16 @@ var x = {
     var xy = {x:d3.mouse(self)[0], y:d3.mouse(self)[1]};
     var xG = this.xScale.invert(xy.x);
     var yG = this.yScale.invert(xy.y)
-    if (this.editing >= 0 && this.editing < this.__calibration__.map.shapes.length && !d3.event.shiftKey) {
+    if (this.editing >= 0 && this.editing < this.calibration.map.shapes.length && !d3.event.shiftKey) {
       var i = this.editing;
-      var n = this.__calibration__.map.shapes[i].vertices.length;
+      var n = this.calibration.map.shapes[i].vertices.length;
       for (var j = 0; j < n; j++) {
-        var p0 = (j===0) ? this.__calibration__.map.shapes[i].vertices[n-1] : this.__calibration__.map.shapes[i].vertices[j-1];
-        var p1 = this.__calibration__.map.shapes[i].vertices[j];
+        var p0 = (j===0) ? this.calibration.map.shapes[i].vertices[n-1] : this.calibration.map.shapes[i].vertices[j-1];
+        var p1 = this.calibration.map.shapes[i].vertices[j];
         p0 = {x:this.xScale(p0.x),y:this.yScale(p0.y)};
         p1 = {x:this.xScale(p1.x),y:this.yScale(p1.y)};
         if (this.onsegment(xy, p0, p1, this.radius)) { // in screen coordinates
-          this.__calibration__.map.shapes[i].vertices.splice(j,0,{x:xG,y:yG});
+          this.calibration.map.shapes[i].vertices.splice(j,0,{x:xG,y:yG});
           this.drawpoly(i);
           this.update();
           return;
@@ -300,52 +260,85 @@ var x = {
         var v = this.points.splice(0);
         var area = polygon_area.signed_area(v);
         var typ = (area > 0) ? 'drivable' : 'obstacle';
-        this.__calibration__.map.shapes.push({'vertices':v,'id':id,'type':typ}); // move unclosed point to the closed set
+        this.calibration.map.shapes.push({'vertices':v,'id':id,'type':typ}); // move unclosed point to the closed set
         this.update();
-        this.editing = this.__calibration__.map.shapes.length-1;
+        this.editing = this.calibration.map.shapes.length-1;
       }
       this.drawunfinished();
-      this.drawpoly(this.__calibration__.map.shapes.length-1);
+      this.drawpoly(this.calibration.map.shapes.length-1);
       this.drawing = false;
     }
   },
   
   set_map:function(msg) {
-    this.__clear__();
+    this.clear();
     if (msg && msg.hasOwnProperty('shapes') ) {
       if (msg.shapes.length > 0 && msg.shapes[0].hasOwnProperty('vertices') && msg.shapes[0].vertices.length > 0) {
         console.log('First vertex:',msg.shapes[0].vertices[0])
       }
-      this.__calibrate__({"map":msg});
+      vy.calibrate({"map":msg});
     }
     this.draw();
   },
   
 };
 
-vy.d3.register('draw', 'mapmaker_draw', function(d3p) {
-  if (!x.g) {
-    x.drag = d3.behavior.drag().on("drag", function(d,i) {
-      x.handleDrag_points(this);
+mapobj.clear();
+
+vy.db.upsert({
+  '#tag':'input',
+  'name':'exportscrapmap',
+  'value':'NateBu:ASITest:map',
+  'callback':'export_map',
+  'input_type':'text',
+  'label':'Map scrap name'
+});
+
+vy.db.upsert({
+  '#tag':'input',
+  'name':'mapmakeractive',
+  'callback':'active_widget',
+  'input_type':'togglebar',
+  'label':'MapMaker'
+});
+
+vy.register_callback('calibration','map',function(map) {
+  mapobj.calibration.map = map;
+  
+  // Make sure shapes have unique string ids
+  var replace = false;
+  var idlist = [];
+  mapobj.calibration.map.shapes.forEach(function(shape) {
+    if (typeof(shape.id)==="number" || idlist.indexOf(shape.id) > -1) {
+      replace = true;
+      shape.id = math.random().toString(36).slice(2);
+    }
+    idlist.push(shape.id);
+  });
+  if (replace) mapobj.update();
+  mapobj.draw();
+
+});
+
+vy.register_callback('d3_draw', 'mapmaker_draw', function(d3p) {
+  if (!mapobj.g) {
+    mapobj.drag = d3.behavior.drag().on("drag", function(d,i) {
+      mapobj.handleDrag_points(this);
     }).on('dragend', function(d){
-      x.handleDragEnd_points(this);
+      mapobj.handleDragEnd_points(this);
     });
   }
-  x.g = d3p.g;
-  x.xScale = d3p.xScale;
-  x.yScale = d3p.yScale;
-  x.draw();
+  mapobj.g = d3p.g; 
+  mapobj.xScale = d3p.xScale;
+  mapobj.yScale = d3p.yScale;
+  mapobj.draw();
 });
-vy.d3.register('keyup', 'mapmaker_keyup', function(self) {
-  x.keyup(self);
+vy.register_callback('d3_keyup', 'mapmaker_keyup', function(self) {
+  mapobj.keyup(self);
 });
-vy.d3.register('mousemove', 'mapmaker_mousemove', function(self) {
-  x.mousemove(self);
+vy.register_callback('d3_mousemove', 'mapmaker_mousemove', function(self) {
+  mapobj.mousemove(self);
 });
-vy.d3.register('mouseup', 'mapmaker_mouseup', function(self) {
-  x.mouseup(self);
+vy.register_callback('d3_mouseup', 'mapmaker_mouseup', function(self) {
+  mapobj.mouseup(self);
 });
-
-return x;
-
-})();

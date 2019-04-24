@@ -1,7 +1,10 @@
 (function() {
-  let draw_new_grid = function(grid,g,xscale,yscale,redraw) {
+  let draw_new_grid = function(grid, g, xscale, yscale, cls, redraw) {
+    if (!(grid.hasOwnProperty('info') && grid.hasOwnProperty('data'))) return;
+    // vy.x3.set_dimensions(xmin, xmin+res*w, ymin, ymin+res*h);
+    // vy.x3.set_grid(true);
   
-    var thisgrid = g.selectAll('image');
+    var thisgrid = g.selectAll('image.'+cls);
     var w = Math.abs(xscale(grid.info.resolution*grid.info.width_cells) - xscale(0));
     var h = Math.abs(yscale(grid.info.resolution*grid.info.height_cells) - yscale(0));
     var res = grid.info.resolution;
@@ -10,7 +13,7 @@
     if (thisgrid.size() === 0 || redraw) {
       thisgrid.remove();
       thisgrid = g.append('image').attr('xlink:href',"data:image/png;base64, "+grid.data)
-        .attr('opacity',0.3);
+        .attr('opacity',0.3).classed(cls,true);
     }
     thisgrid.attr('x',xscale(x0)).attr('y',yscale(y0)-h).attr('height',h).attr('width',w);
     
@@ -24,8 +27,7 @@
         })
         .style('opacity',0.3);
     }*/
-
-}
+  }
   
   return {draw_new_grid:draw_new_grid};
-});
+})();
