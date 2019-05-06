@@ -14,10 +14,6 @@ var pathobj = {
   update:function() {
     vy.calibrate({'pathlist':this.pathlist});
   },
-  
-  active_widget: function(val) {
-    this.activemenu = val.active;
-  },
 
   onsegment:function(p, v, w, thresh) {
     function sqr(x) { return x * x }
@@ -207,6 +203,10 @@ var pathobj = {
 };
 
 pathobj.clear();
+
+vy.register_callback('callback','active_widget',function(val,doc) {
+  pathobj.activemenu = val.active;
+});
 
 vy.db.upsert({
   '#tag':'input',

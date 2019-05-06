@@ -18,14 +18,6 @@ var mapobj = {
     this.g = null;
   },
 
-  export_map: function(val,doc) {
-    vy.save_scrap(val,'NateBu:Base:Mapx',this.calibration.map,null);
-  },
-  
-  active_widget: function(val) {
-    this.activemenu = val.active;
-  },
-  
   update:function() {
     vy.publish('publish_map',this.calibration.map);
     vy.calibrate({"map":this.calibration.map});
@@ -284,6 +276,14 @@ var mapobj = {
 };
 
 mapobj.clear();
+
+vy.register_callback('callback','export_map',function(val,doc) {
+  vy.save_scrap(val,'NateBu:Base:Mapx', mapobj.calibration.map, null);
+});
+
+vy.register_callback('callback','active_widget',function(val,doc) {
+  mapobj.activemenu = val.active;
+});
 
 vy.db.upsert({
   '#tag':'input',

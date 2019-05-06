@@ -1,0 +1,21 @@
+{
+  "#thingtype": "widget",
+  "breakpoint": [],
+  "breakscript": [],
+  "calibration": [],
+  "name": "@@:Base:WindowCharts",
+  "share": [
+    {
+      "name": "chartjs",
+      "secret": false,
+      "type": "file::@@:Base:chart280.js"
+    },
+    {
+      "name": "-",
+      "secret": false,
+      "type": "file::@@:Base:WindowCharts.js"
+    }
+  ],
+  "signal": [],
+  "stage": []
+}

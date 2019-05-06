@@ -92,7 +92,20 @@
       .style('stroke',function(d,i) { return (d.color) ? d.color : 'black'; });
   };
 
+  let draw_knotted_polyline = function(g_, xScale, yScale, points, style, cls) {
+    g_.selectAll('g.'+cls).remove();
+    var g = g_.append('g').classed(cls,true);
+    g.selectAll('circle').data(points).enter().append('circle')
+      .attr('cx',function(d,i) {return xScale(d.x)})
+      .attr('cy',function(d,i) {return yScale(d.y)})
+      .attr('r',3)
+      .style('fill','black');
+    var p = points.map(function(p) { return [xScale(p.x),yScale(p.y)]; });
+    g.append('polyline').attr({'points':p,'style':style});
+  };
+
   return {
+    draw_knotted_polyline:draw_knotted_polyline,
     draw_new_map:draw_new_map,
     draw_shapes:draw_shapes,
     draw_polyline:draw_polyline,
