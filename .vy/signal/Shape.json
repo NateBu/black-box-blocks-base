@@ -20,8 +20,5 @@
       "type": "signal::@@:Base:Point2D"
     }
   ],
-  "name": "@@:Base:Shape",
-  "society": [
-    "uWH7kXFXcu6SqWLXu"
-  ]
+  "name": "@@:Base:Shape"
 }

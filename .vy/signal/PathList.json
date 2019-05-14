@@ -11,6 +11,5 @@
       "type": "signal::@@:Base:Shape"
     }
   ],
-  "name": "@@:Base:PathList",
-  "society": []
+  "name": "@@:Base:PathList"
 }
