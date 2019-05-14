@@ -245,6 +245,7 @@ def exit_handler (event):
   gdb.execute("quit "+str(exitflag))
 
 def action_assignment(action):
+  print('PARSING ACTION',action)
   if 'source' in action:
     if 'breakpoint' in action and not action['active']:
       action['breakpoint'].delete()
@@ -317,7 +318,10 @@ def parse_sources(replace_paths=[]):
 
 def get_command():
   cmd = user_command.get()
-  if cmd.startswith('v '):
+  if type(cmd) is not str:
+    print('get_command in vygdb is not a string',cmd)
+    cmd = None
+  elif cmd.startswith('v '):
     try:
       print("vygdb:: "+json.dumps(marshal(gdb.parse_and_eval(cmd[2:]))))
     except Exception as exc:
@@ -391,7 +395,7 @@ if __name__ == '__main__':
     while True:
       data = SOCK.recv()
       if data and 'vygdb' in data:
-        user_command.put( data['vygdb'] )   
+        user_command.put( data['vygdb'] )
 
   host = 'docker.host.internal'
   # Since docker.host.internal is broken on linux (https://github.com/docker/for-linux/issues/264)
