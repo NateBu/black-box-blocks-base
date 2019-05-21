@@ -1,4 +1,5 @@
-sinesurface = function(seed,gridd,maxamp,nfacets) {
+(function() {
+  let sinesurface = function(seed,gridd,maxamp,nfacets) {
   // A seeded RNG (same results for = values of gridd)
   Math.seedrandom(''+seed+'');
   var waves = [];
@@ -78,3 +79,5 @@ sinesurface = function(seed,gridd,maxamp,nfacets) {
   
   return {waves:waves, geometry:geometry, surface_derivatives:surface_derivatives};
 };
+  return {sinesurface:sinesurface};
+})();

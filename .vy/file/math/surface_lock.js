@@ -1,4 +1,5 @@
-surface_lock = function(x,y,dxdt,dydt,z,dzdx,dzdy) {
+(function(){
+  let surface_lock = function(x,y,dxdt,dydt,z,dzdx,dzdy) {
     // Inputs:
     // x = x position of vehicle (m)
     // y = y position of vehicle (m)
@@ -55,6 +56,10 @@ surface_lock = function(x,y,dxdt,dydt,z,dzdx,dzdy) {
     }
     return {roll:roll,pitch:pitch,yaw:yaw,dzdt:dzdt}
 }
+  return {surface_lock:surface_lock};
+})();
+
+
 //function R=Rz(x); R=[[cos(x),-sin(x),0];[sin(x),cos(x),0];[0,0,1]];
 //function R=Rx(x); R=[[1,0,0];[0,cos(x),-sin(x)];[0,sin(x),cos(x)]];
 //function R=Ry(x); R=[[cos(x),0,sin(x)];[0,1,0];[-sin(x),0,cos(x)]];
