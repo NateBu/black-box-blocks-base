@@ -1,5 +1,5 @@
 (function() {
-  let colors = [
+  let colors = [ 
     'rgba(0,0,255,:)',
     'rgba(0,205,0,:)',
     'rgba(255,0,0,:)',
@@ -111,8 +111,8 @@
           });
           
           db.insert({
-            '#tag':'analysis',
-            type:'chart',
+            '#tag':'chartjs',
+            window:'chartjs',
             'name':id,
             'data':chart});
         });
@@ -185,7 +185,12 @@
         }
       }
     };
-    db.upsert({'#tag':'analysis', type:'chart', 'name':chart_label,'data':chart});
+    db.upsert({
+      '#tag':'chartjs',
+      window:'chart_label',
+      name:chart_label,
+      data:chart
+    });
   };
   
   return {
