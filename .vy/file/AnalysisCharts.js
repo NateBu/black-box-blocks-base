@@ -98,7 +98,7 @@
     return chart;
   }
   
-  let analysis_chart = function(self, query, fields, plotdata, db) {
+  let analysis_chart = function(self, query, fields, plotdata, wndow, db) {
     var callback = function(err, rslt) {
       if (!err) {
         
@@ -112,7 +112,7 @@
           
           db.insert({
             '#tag':'chartjs',
-            window:'chartjs',
+            window:wndow,
             'name':id,
             'data':chart});
         });
@@ -123,7 +123,7 @@
     vy.fetch('scenario', query, {fields:fields}, callback);
   };
   
-  let line_chart = function(chart_label, x_, ylist, db) {
+  let line_chart = function(x_, ylist) {
     //x = {axis_label:'Time (sec)',data:[0,0.01,...,10.3]}
     //ylist = [
     //  {axis_label:'L (m)', sets:[{set_label:'set1':data:[1,2.1,...,0.1]},{label:'set2':data:[0.01,-.1,...,3.2]}]
@@ -185,16 +185,13 @@
         }
       }
     };
-    db.upsert({
-      '#tag':'chartjs',
-      window:'chart_label',
-      name:chart_label,
-      data:chart
-    });
+    return chart;
+    //  db.upsert({'#tag':'chartjs', window:'chart_labelx', name:chart_label, data:chart});
   };
   
   return {
     analysis_chart:analysis_chart,
     line_chart:line_chart
-  }
+  };
+  
 })();
