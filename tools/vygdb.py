@@ -19,7 +19,7 @@ from multiprocessing import Queue
 import threading
 global SOCK, VYGDB
 SOCK = None
-VYGDB = {'METHODS':{},'MARSHALS':{},'BREAKPOINTS':[]}
+VYGDB = {'METHODS':{},'MARSHALS':{},'BREAKPOINTS':[],'DATA':{}}
 user_command = Queue()
 
 vyjob = os.environ['VYJOB']
@@ -220,7 +220,7 @@ class custom_breakpoint(gdb.Breakpoint):
 
     if self.method is not None and self.method in VYGDB['METHODS']:
       try:
-        stopb = VYGDB['METHODS'][self.method](msg, {'queue':user_command, 'gdb':gdb, 'marshal':marshal})
+        stopb = VYGDB['METHODS'][self.method](msg, {'queue':user_command, 'gdb':gdb, 'marshal':marshal, 'data':VYGDB['DATA']})
         if type(stopb) == bool:
           stop_ = stop_ or stopb
       except Exception as exc:
