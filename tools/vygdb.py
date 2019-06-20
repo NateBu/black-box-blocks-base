@@ -277,43 +277,41 @@ def parse_sources(replace_paths=[]):
   pattern2 = 'Source files for which symbols will be read in on demand:'
   p1s = sources.find(pattern1)
   p2s = sources.find(pattern2)
-  vyscripts = []
+  vyscripts_filter_breakpoints = []
   if p1s >= 0 and p2s >=0 :
     symbols = sources[p1s+len(pattern1):p2s].strip().split(', ') + sources[p2s+len(pattern2):].strip().split(', ')
     for filename in symbols:
       for rpath in replace_paths:
         filename = filename.replace(rpath['old'],rpath['new'])
 
-      delimiter = re.compile('(?s)<vygdb(.*?)vygdb>')
+      delimiter = re.compile('(?s)<vygdb(.*?)vygdb>', re.MULTILINE|re.DOTALL)
       try:
-        with open(filename, 'r', encoding='utf-8') as file:
-          vyscripts += delimiter.findall(file.read())
         
         with open(filename, 'r', encoding='utf-8') as file:
-          for (i, line) in enumerate(file):
-            for mtch in delimiter.findall(line):
-              try:
-                cmd = json.loads(mtch)
-                cmd['source'] = filename.split('/')[-1]+':'+str(i+1)
-                if 'active' not in cmd:
-                  cmd['active'] = False # Always default to false
-                for c in VYGDB['BREAKPOINTS']:
-                  if cmd['source']==c['source']:
-                    raise ParseSourceException('Duplicate source breakpoint "'+c['source']+'"')
-                VYGDB['BREAKPOINTS'].append(cmd)
-              except Exception as exc:
-                print('  vygdb.parse_sources: Could not process potential debug point in '+filename+' at line '+str(i)+':\n'+line,exc)
-                sys.stdout.flush()
+          string = file.read() #vyscripts += delimiter.findall(file.read())
+          line = [m.end() for m in re.finditer('.*\n',string)]
+
+        for m in re.finditer(delimiter, string):
+          lineno = next(i for i in range(len(line)) if line[i]>m.start(1))
+          mtch = m.group(1)
+          try:
+            cmd = json.loads(mtch)
+            cmd['source'] = filename.split('/')[-1]+':'+str(lineno+1)
+            if 'active' not in cmd:
+              cmd['active'] = False # Always default to false
+            for c in VYGDB['BREAKPOINTS']:
+              if cmd['source']==c['source']:
+                raise ParseSourceException('Duplicate source breakpoint "'+c['source']+'"')
+            VYGDB['BREAKPOINTS'].append(cmd)
+          except Exception as exc:
+            vyscripts_filter_breakpoints.append(mtch)
+            #print('  vygdb.parse_sources: Could not process potential debug point in '+filename+' at line '+str(i)+':\n'+line,exc)
+            #sys.stdout.flush()
+
       except Exception as exc:
         print('  vygdb.parse_sources: warning, failed reading of '+filename+':',exc)
         sys.stdout.flush()
   
-  vyscripts_filter_breakpoints = []
-  for x in vyscripts:
-    try:
-      json.loads(x)
-    except:
-      vyscripts_filter_breakpoints.append(x)
   return vyscripts_filter_breakpoints
 
 def get_command():
