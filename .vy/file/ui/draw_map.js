@@ -1,4 +1,8 @@
 (function() {
+  let clear_map = function(map, g) {
+      g.selectAll('g.id-'+map._id).remove();
+  };
+  
   let draw_new_map = function(map,g,xscale,yscale) {
   
     //for (var ii = 0; ii < map.shapes.length; ii++) {
@@ -105,6 +109,7 @@
   };
 
   return {
+    clear_map:clear_map,
     draw_knotted_polyline:draw_knotted_polyline,
     draw_new_map:draw_new_map,
     draw_shapes:draw_shapes,
