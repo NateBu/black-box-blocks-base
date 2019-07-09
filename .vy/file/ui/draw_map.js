@@ -4,7 +4,6 @@
   };
   
   let draw_new_map = function(map,g,xscale,yscale) {
-  
     //for (var ii = 0; ii < map.shapes.length; ii++) {
       //this.g.selectAll('g.shape_id'+poly.id).remove();
       //var g = this.g.append('g')
