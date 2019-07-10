@@ -278,7 +278,7 @@ var mapobj = {
 mapobj.clear();
 
 vy.register_callback('callback','export_map',function(val,doc) {
-  vy.save_scrap(val,'NateBu:Base:Mapx', mapobj.calibration.map, null);
+  vy.save_scrap(val,'research:Base:Mapx', mapobj.calibration.map, null);
 });
 
 vy.register_callback('callback','active_widget',function(val,doc) {
@@ -288,7 +288,7 @@ vy.register_callback('callback','active_widget',function(val,doc) {
 vy.db.upsert({
   '#tag':'input',
   'name':'exportscrapmap',
-  'value':'NateBu:ASITest:map',
+  'value':'research:ASITest:map',
   'callback':'export_map',
   'input_type':'text',
   'label':'Map scrap name'
