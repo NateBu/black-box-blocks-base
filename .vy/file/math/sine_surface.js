@@ -1,5 +1,4 @@
-(function() {
-  let sinesurface = function(seed,gridd,maxamp,nfacets) {
+exports.sinesurface = function(seed,gridd,maxamp,nfacets) {
   // A seeded RNG (same results for = values of gridd)
   Math.seedrandom(''+seed+'');
   var waves = [];
@@ -28,7 +27,7 @@
     }
     return ztarget;
   };
-  
+
   var twopi = 2*Math.PI;
   var surface_derivatives = function(x, y, yaw) {
     var z = 0, dzdx = 0, dzdy = 0;
@@ -49,7 +48,6 @@
     }
     return {z:z,dzdx:dzdx,dzdy:dzdy};
   };
-  
   var geometry = new THREE.Geometry();
   var d = gridd;
   var n = Math.max(2,Math.min(200,nfacets));
@@ -76,8 +74,5 @@
       }
     }
   }
-  
   return {waves:waves, geometry:geometry, surface_derivatives:surface_derivatives};
 };
-  return {sinesurface:sinesurface};
-})();
