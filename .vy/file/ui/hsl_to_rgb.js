@@ -9,39 +9,30 @@
  * @param   {number}  l       The lightness
  * @return  {Array}           The RGB representation
  */
-(function() {
-   
-  hsl_to_rgb = function(h, s, l){
-    var r, g, b;
-    if(s === 0){
-        r = g = b = l; // achromatic
-    }else{
-        var hue2rgb = function hue2rgb(p, q, t){
-            if(t < 0) t += 1;
-            if(t > 1) t -= 1;
-            if(t < 1/6) return p + (q - p) * 6 * t;
-            if(t < 1/2) return q;
-            if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-            return p;
-        }
+exports.hsl_to_rgb = function(h, s, l){
+  var r, g, b;
+  if(s === 0){
+      r = g = b = l; // achromatic
+  }else{
+      var hue2rgb = function hue2rgb(p, q, t){
+          if(t < 0) t += 1;
+          if(t > 1) t -= 1;
+          if(t < 1/6) return p + (q - p) * 6 * t;
+          if(t < 1/2) return q;
+          if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+      }
 
-        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-        var p = 2 * l - q;
-        r = hue2rgb(p, q, h + 1/3);
-        g = hue2rgb(p, q, h);
-        b = hue2rgb(p, q, h - 1/3);
-    }
-    return [r,g,b];
-  };
+      var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      var p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+  }
+  return [r,g,b];
+};
 
-  hsl_to_color = function(h, s, l) {
-    v = hsl_to_rgb(h,s,l);
-    return 'rgb('+Math.floor(v[0]*255)+','+Math.floor(v[1]*255)+','+Math.floor(v[2]*255)+')';
-  };
-  
-  return {
-    hsl_to_rgb:hsl_to_rgb,
-    hsl_to_color:hsl_to_color
-  };
- 
-})();
+exports.hsl_to_color = function(h, s, l) {
+  v = hsl_to_rgb(h,s,l);
+  return 'rgb('+Math.floor(v[0]*255)+','+Math.floor(v[1]*255)+','+Math.floor(v[2]*255)+')';
+};
