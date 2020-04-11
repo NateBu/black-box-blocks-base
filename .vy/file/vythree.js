@@ -2,17 +2,25 @@ const { load_then_execute } = require('file::@@:Base:load_then_execute.js');
 
 let three = {};
 let animate = function() {
-  requestAnimationFrame( animate );
-  if (three.ORBITCONTROLS) three.controls.update();
-  three.render();
+  if (three.INACTIVE) {
+    setTimeout(animate,200);
+    if (three.ORBITCONTROLS) three.controls.update();
+    three.render();
+  } else {
+    requestAnimationFrame( animate );
+    if (three.ORBITCONTROLS) three.controls.update();
+    three.render();
+  }
 };
 
 three = {
   ORBITCONTROLS:false,
+  INACTIVE:false,
   scene:null, 
   camera:null, 
   renderer:null, 
   controls:null,
+  div:null,
   render: function() {
     this.renderer.render( this.scene, this.camera );
   },
@@ -24,13 +32,20 @@ three = {
       },1000); // wait til loaded
       return;
     }
+    
+    // div.addEventListener("mousemove", function(e){
+    //   e.stopPropagation();
+    //   e.preventDefault();
+    //   console.log('hi')
+    // })
+    
     let width = div.offsetWidth;
     let height = div.offsetHeight;
     var fov = 70;
     var near = 0.1;
     var far = 10000;
     //this.camera = new THREE.PerspectiveCamera( 20, (height !== 0) ? width / height : 1, 1, 10000 );
-
+    this.div = div;
     this.camera = new THREE.PerspectiveCamera( fov, (height !== 0) ? width / height : 1, near, far);
 		this.camera.position.z = 1800;
     //this.camera.position = {x: -400, y: -400, z: 220};
@@ -85,7 +100,9 @@ exports.three = three;
 load_then_execute(
   ["https://cdnjs.cloudflare.com/ajax/libs/three.js/108/three.min.js"],
   function() {
+    // window.addEventListener("keydown", function(e){ console.log('A') });
     require('file::@@:Base:three_orbit_controls.js');
+    // window.addEventListener("keydown", function(e){ console.log('B') });
     three.ready = true;
     vy.log.write('vythree is ready');
   });

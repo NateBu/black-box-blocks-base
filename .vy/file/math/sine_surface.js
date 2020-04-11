@@ -2,7 +2,7 @@ require('file::@@:Base:tools/seedrandom.js');
 
 const twopi = 2*Math.PI;
 exports.surface_derivatives = function(x, y, yaw, waves) {
-    var z = 0, dzdx = 0, dzdy = 0;
+    var z = 0, dzdx = 0, dzdy = 0, d2zdx2 = 0, d2zdy2 = 0, d2zdxdy = 0;
     for (ii = 0; ii < waves.length; ii++) {
       // Length along wave ii (normalized to wavelength)
       // Each wave has [amplitude, wavelength, direction, phase]
@@ -13,12 +13,19 @@ exports.surface_derivatives = function(x, y, yaw, waves) {
       var cq = Math.cos(phi);
       var sq = Math.sin(phi);
       var L = (x*cq + y*sq)/wvl;  var dLdx = cq/wvl;      var dLdy = sq/wvl;
+      var d2Ldx2 = 0, d2Ldy2 = 0, d2Ldxdy = 0;
       var q = L*twopi+psi;        var dqdx = dLdx*twopi;  var dqdy = dLdy*twopi;
+      var d2qdx2 = d2Ldx2*twopi, d2qdy2 = d2Ldy2*twopi, d2qdxdy = d2Ldxdy*twopi;
       var cq_ = Math.cos(q);
       var sq_ = Math.sin(q);
-      z = z + amp*cq_;            dzdx -= amp*dqdx*sq_;   dzdy -= amp*dqdy*sq_;
+      z = z + amp*cq_;
+      dzdx -= amp*dqdx*sq_;
+      dzdy -= amp*dqdy*sq_;
+      d2zdx2 -= amp*(d2qdx2*sq_ + dqdx*cq_*dqdx);
+      d2zdy2 -= amp*(d2qdy2*sq_ + dqdy*cq_*dqdy);
+      d2zdxdy -= amp*(d2qdxdy*sq_ + dqdy*cq_*dqdx);
     }
-    return {z:z,dzdx:dzdx,dzdy:dzdy};
+    return {z:z,dzdx:dzdx,dzdy:dzdy,d2zdx2:d2zdx2,d2zdy2:d2zdy2,d2zdxdy:d2zdxdy};
   };
 
 exports.sine_surface = function(seed,gridd,maxamp,nfacets) {

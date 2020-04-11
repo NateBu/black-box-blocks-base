@@ -1,5 +1,6 @@
 exports.collisions = function(swarm, coefficient_of_restitution, xbody) {
   var shieldp = [];
+  let collis = [];
   for (var ii in swarm) {
     var boti = swarm[ii];
     var com = boti.shield;
@@ -11,31 +12,36 @@ exports.collisions = function(swarm, coefficient_of_restitution, xbody) {
       var dy = pi.y-pj.y;
       var dz = pi.z-pj.z;
       var dmag = Math.sqrt(dx*dx+dy*dy+dz*dz);
-      dx = dx/dmag; dy = dy/dmag; dz = dz/dmag;
-      if (dmag < (boti.shield.radius+botj.shield.radius)) {
+      let doverlap = (boti.shield.radius+botj.shield.radius) - dmag;
+      if (doverlap > 0) {
+        dx = dx/dmag; dy = dy/dmag; dz = dz/dmag;
+        boti.state.x += dx*doverlap/2;
+        boti.state.y += dy*doverlap/2;
+        botj.state.x -= dx*doverlap/2;
+        botj.state.y -= dy*doverlap/2;
+        collis.push({ii:ii,jj:jj,dx:dx,dy:dy,dz:dz});
         var mi = boti.mass;
         var mj = botj.mass;
         // velocities perpendicular to collision before collision
-        var viperp = boti.motion.vx*dx+boti.motion.vy*dy+boti.motion.vz*dz;
-        var vjperp = botj.motion.vx*dx+botj.motion.vy*dy+botj.motion.vz*dz;
+        var viperp = boti.state.vx*dx+boti.state.vy*dy+boti.state.vz*dz;
+        var vjperp = botj.state.vx*dx+botj.state.vy*dy+botj.state.vz*dz;
         if (viperp > 0 && vjperp < 0) continue; // Already moving away from each other
         var p = viperp*mi+vjperp*mj; // Momentum in direction of collision
         var f = Math.sqrt(Math.min(1,Math.max(0, coefficient_of_restitution)))/(mi+mj);
         var vi = f*(viperp*(mi-mj)+2*mj*vjperp);
         var vj = f*(vjperp*(mj-mi)+2*mi*viperp);
         
-        boti.motion.vx -= dx*(viperp-vi);
-        boti.motion.vy -= dy*(viperp-vi);
-        boti.motion.vz -= dz*(viperp-vi);
-        botj.motion.vx -= dx*(vjperp-vj);
-        botj.motion.vy -= dy*(vjperp-vj);
-        botj.motion.vz -= dz*(vjperp-vj);
-        boti.state.v = 0;
-        botj.state.v = 0;
-        if (boti.motion.state=='DRIVE') boti.motion.state = 'SLIDE';
-        if (botj.motion.state=='DRIVE') botj.motion.state = 'SLIDE';
+        boti.state.vx -= dx*(viperp-vi);
+        boti.state.vy -= dy*(viperp-vi);
+        boti.state.vz -= dz*(viperp-vi);
+        botj.state.vx -= dx*(vjperp-vj);
+        botj.state.vy -= dy*(vjperp-vj);
+        botj.state.vz -= dz*(vjperp-vj);
+        if (boti.motion_state=='DRIVE') boti.motion_state = 'SLIDE';
+        if (botj.motion_state=='DRIVE') botj.motion_state = 'SLIDE';
       }
     }
     shieldp.push(pi);
   }
+  return collis;
 };
