@@ -1,0 +1,13 @@
+{
+  "element": [
+    {
+      "name": "id",
+      "type": "int32"
+    },
+    {
+      "length": "0",
+      "name": "paths",
+      "type": "definition:vybots-Shape"
+    }
+  ]
+}

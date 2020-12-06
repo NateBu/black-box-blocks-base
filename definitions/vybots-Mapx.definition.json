@@ -1,0 +1,18 @@
+{
+  "element": [
+    {
+      "name": "id",
+      "type": "int32"
+    },
+    {
+      "length": "0",
+      "name": "attributes",
+      "type": "definition:vybots-KeyValue"
+    },
+    {
+      "length": "0",
+      "name": "shapes",
+      "type": "definition:vybots-Shape"
+    }
+  ]
+}

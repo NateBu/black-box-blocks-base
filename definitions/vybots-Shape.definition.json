@@ -1,0 +1,22 @@
+{
+  "element": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "type",
+      "type": "string"
+    },
+    {
+      "length": "0",
+      "name": "attributes",
+      "type": "definition:vybots-KeyValue"
+    },
+    {
+      "length": "0",
+      "name": "vertices",
+      "type": "definition:vybots-Point2D"
+    }
+  ]
+}

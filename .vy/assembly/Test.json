@@ -1,9 +1,0 @@
-{
-  "#thingtype": "assembly",
-  "assembly": [],
-  "calibration": [],
-  "name": "@@:Base:Test",
-  "quiz": "-",
-  "service": [],
-  "visualization": "@@:Base:testtop.js"
-}
