@@ -8,35 +8,54 @@ import { xbodyf } from '/vy/vybots/robots/xbody.js';
 import { swarm } from '/vy/vybots/robots/vybot_alpha_swarm.js';
 import { dynamics } from '/vy/vybots/robots/vybot_alpha_dynamics.js';
 let simcontrols = {RUNNING:false};
-let DT = 0.05;
+let DT = 0.05;  // INTEGRATION INTERVAL
 let THREEDIV = document.querySelector('div.vybotworld');
+
+
 
 const setup = function() {
   if (window.innerWidth === 0 || !three.ready) {
     setTimeout(setup,1000); 
     return;
   }
+  // Initialize threejs
   three.init(THREEDIV);
-  let number_of_swarms = 5;
-  let bots_per_swarm = 4;
+
+  // Set number of swarms and bots per swarm
+  let number_of_swarms = 1;
+  let bots_per_swarm = 1;
+
+  // Build the ground with it's surface derivatives
   let arena_size = 100;
   let amplitude = 3;
   let ground = sine_surface("excellent", arena_size, amplitude, 200);
   environment(three, ground.geometry);
-  
-  let THREE_BODIES = {};
-  let SWARM = [];
-
-  let xbody = xbodyf(three);
   let surface_derivs = function(x, y, yaw) {
     return surface_derivatives(x, y, yaw, ground.waves);
   };
-  let dofs = {};
+  
+  let THREE_BODIES = {};
+  let SWARM = [];
+  let XBODY = xbodyf(three);
+  
+  var editor = ace.edit("editor");
+  editor.setTheme("ace/theme/twilight");
+  editor.session.setMode("ace/mode/javascript");
+  editor.setFontSize(20);
+  editor.setValue('// bot_command("FORWARD");\n// bot_command("BACK");\n// bot_command("LEFT");\n// bot_command("RIGHT");\nkeydownfunc = function(e, bot_command) {\n  console.log("HI!");\n}\n');
   
   let INIT = function() {
     swarm(number_of_swarms, bots_per_swarm, arena_size, THREE_BODIES, SWARM);
-    xbody.init(THREE_BODIES); //degree_of_freedom_order
-    teleop_setup(three, simcontrols, SWARM[0]);
+    XBODY.init(THREE_BODIES); //degree_of_freedom_order
+    let code = editor.getValue();
+    try {
+      let keydownfunc = function() {}
+      eval(code);
+      teleop_setup(three, simcontrols, SWARM[0], keydownfunc);
+    } catch(err) {
+      console.log('Code failed to load: '+err);
+    }
+
   };
   INIT();
   THREEDIV.addEventListener("dblclick", INIT, false); 
@@ -46,14 +65,14 @@ const setup = function() {
     let rslts = {};
     let N = 1;
     for (var ii = 0; ii < N; ii++) {
-      rslts = dynamics(SWARM, DT/N, xbody, surface_derivs);
+      rslts = dynamics(SWARM, DT/N, XBODY, surface_derivs);
     }
-    let eye = xbody.l2g(new THREE.Vector3( -1, 0, 0.6 ),'bot_0_0_chassis');
-    let lookat = xbody.l2g(new THREE.Vector3( 1, 0, 0.5 ),'bot_0_0_chassis');
-    let up = xbody.v2g(new THREE.Vector3( 0, 0, 1 ),'bot_0_0_chassis');
-    xbody.three.camera.position.set(eye.x,eye.y,eye.z);
-    xbody.three.camera.lookAt(lookat);
-    xbody.three.camera.up.set(up.x,up.y,up.z);
+    let eye = XBODY.l2g(new THREE.Vector3( -1, 0, 0.6 ),'bot_0_0_chassis');
+    let lookat = XBODY.l2g(new THREE.Vector3( 1, 0, 0.5 ),'bot_0_0_chassis');
+    let up = XBODY.v2g(new THREE.Vector3( 0, 0, 1 ),'bot_0_0_chassis');
+    XBODY.three.camera.position.set(eye.x,eye.y,eye.z);
+    XBODY.three.camera.lookAt(lookat);
+    XBODY.three.camera.up.set(up.x,up.y,up.z);
     rslts.collisions.forEach(function(c) {
       let boti = SWARM[c.ii];
       let botj = SWARM[c.jj];

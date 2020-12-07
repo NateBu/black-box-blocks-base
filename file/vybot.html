@@ -10,25 +10,24 @@
       .axis path, .axis line {fill: none; stroke: rgba(100,100,100,.2); stroke-width: 2; shape-rendering: crispEdges;}
       .axis.minor path, .axis.minor line {fill: none;stroke: rgba(100,100,100,.1);stroke-width: 2;shape-rendering: crispEdges;}
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.min.js" integrity="sha512-GoORoNnxst42zE3rYPj4bNBm0Q6ZRXKNH2D9nEmNvVF/z24ywVnijAWVi/09iBiVDQVf3UlZHpzhAJIdd9BXqw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-twilight.min.js" integrity="sha512-2IqbT6swyxY2XnBLoAIUYyxu2Oj1XoS7AafJE/5q3vl0mmXyKxIIyKqh1jZNqZeNsp8uP8JRNtG2Z6sgoadXOA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-javascript.min.js" integrity="sha512-ZxMbXDxB0Whct+zt+DeW/RZaBv33N5D7myNFtBGiqpDSFRLxn2CNp6An0A1zUAJU/+bl8CMVrwxwnFcpFi3yTQ==" crossorigin="anonymous"></script>
   </head>
 
   <body>
-    <div class="d3map" style="position:absolute;left:0px;top:0px;height:100%;width:50%">
-
+    <div id="editor" style="position:absolute;left:0px;top:0px;height:100%;width:50%;overflow: hidden;">
     </div>
-    <div class="vybotworld" style="position:absolute;right:0px;top:0px;height:100%;width:50%">
-
+    <div class="vybotworld" style="position:absolute;right:0px;top:0px;height:100%;width:50%;overflow: hidden;">
     </div>
 
     <script type="module">
       import { VY } from '/vybase/VY.js';
-      import '/vy/vybots/testtop.js';
+      import '/vy/vybots/vybot_basic.js';
       // import * as THREE from 'https://unpkg.com/three@<VERSION>/build/three.module.js';
       // import { OrbitControls } from 'https://unpkg.com/three@<VERSION>/examples/jsm/controls/OrbitControls.js';
       // window.THREE = THREE;
       // window.OrbitControls = OrbitControls;
-      // VY.on_artifact('RESULTS', window.results_artifact);
-      // VY.on_artifact('output/model_fit_artifact', window.vehicle_model_fit_artifact);
     </script>
 
 

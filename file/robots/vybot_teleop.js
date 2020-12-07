@@ -1,20 +1,30 @@
 import { VY } from '/vybase/VY.js';
 
-export function teleop_setup(three, simcontrols, vybot) {
-  
+const MAX_TORQUE = 2;
+const MIN_TORQUE = -2;
+const MAX_STEER_ANGLE = 0.55;
+const MIN_STEER_ANGLE = -0.55;
+const TORQUE_STEP = (MAX_TORQUE - MIN_TORQUE)/40;
+const STEER_STEP = (MAX_STEER_ANGLE - MIN_STEER_ANGLE)/20;
+const RESISTIVE_STEP = 1/40;
+let COMMAND = {steer:'NONE',throttle:'NONE'};
+
+
+const bot_command = function(c) { 
+  if (c=='RIGHT' || c=='LEFT') COMMAND.steer = c;
+  if (c=='FORWARD' || c=='BACK') COMMAND.throttle = c;
+}
+
+export function teleop_setup(three, simcontrols, vybot, keydownfunc) {
+  let el = document.querySelector('.vybotcontrols');
+  if (el) el.parentNode.removeChild(el);
+
   let controldiv = document.createElement('div');
+  controldiv.classList.add('.vybotcontrols');
   controldiv.setAttribute('style',`position:absolute;background-color:darkgray;bottom:10px;left:calc(50% - 150px);height:40px;width:300px;padding:0px;border-radius:5px;margin: 0 auto;`);
   controldiv.setAttribute('tabindex',"0");
   document.body.appendChild(controldiv);
 
-  const MAX_TORQUE = 200;
-  const MIN_TORQUE = -200;
-  const MAX_STEER_ANGLE = 0.55;
-  const MIN_STEER_ANGLE = -0.55;
-  const TORQUE_STEP = (MAX_TORQUE - MIN_TORQUE)/40;
-  const STEER_STEP = (MAX_STEER_ANGLE - MIN_STEER_ANGLE)/20;
-  const RESISTIVE_STEP = 1/40;
-  let COMMAND = {steer:'NONE',throttle:'NONE'};
   setInterval(function() {
     if (!simcontrols.RUNNING) return;
     let dst = 0, dto = 0, dre = -RESISTIVE_STEP;
@@ -31,7 +41,7 @@ export function teleop_setup(three, simcontrols, vybot) {
     //   Math.min(1,vybot.resistive_torque + RESISTIVE_STEP) :
     //   Math.max(0,vybot.resistive_torque - RESISTIVE_STEP);
     vybot.wheel_torque = Math.max(MIN_TORQUE,Math.min(MAX_TORQUE,vybot.wheel_torque));
-    let gage = ` T:${vybot.wheel_torque.toFixed(0)} S:${vybot.desired_steer_angle.toFixed(2)} `;
+    let gage = ` T:${vybot.wheel_torque.toFixed(2)} S:${vybot.desired_steer_angle.toFixed(2)} `;
     controldiv.innerHTML = `<center style="width: calc(100% - 20px);padding:10px">${gage}</center>`;
     // VY.log.write(COMMAND, vybot.wheel_torque, vybot.resistive_torque, vybot.desired_steer_angle)
   },50);
@@ -55,21 +65,26 @@ export function teleop_setup(three, simcontrols, vybot) {
   controldiv.addEventListener("keyup", function(e){
     e.stopPropagation();
     e.preventDefault();
-    if (e.keyCode === 37 || e.keyCode === 39) { COMMAND.steer = 'NONE';    // Left
-    } else if (e.keyCode === 38 || e.keyCode === 40) { COMMAND.throttle = 'NONE'; // Forward
-    }
+    COMMAND.steer = 'NONE'
+    COMMAND.throttle = 'NONE'
+    // if (e.keyCode === 37 || e.keyCode === 39) { COMMAND.steer = 'NONE';    // Left
+    // } else if (e.keyCode === 38 || e.keyCode === 40) { COMMAND.throttle = 'NONE'; // Forward
+    // }
   });
 
   controldiv.addEventListener("keydown", function(e){
     e.stopPropagation();
     e.preventDefault();
-    if (e.keyCode === 32)        { run();               // spacebar
-    } else if (e.keyCode === 37) { COMMAND.steer = 'LEFT';    // Left
-    } else if (e.keyCode === 39) { COMMAND.steer = 'RIGHT';   // Right
-    } else if (e.keyCode === 38) { COMMAND.throttle = 'FORWARD'; // Forward
-    } else if (e.keyCode === 40) { COMMAND.throttle = 'BACK';    // Back
+    if (keydownfunc) {
+      keydownfunc(e, bot_command);
+    } else {
+      if (e.keyCode === 32)        { run();               // spacebar
+      } else if (e.keyCode === 37) { bot_command('LEFT');    // Left
+      } else if (e.keyCode === 39) { bot_command('RIGHT');   // Right
+      } else if (e.keyCode === 38) { bot_command('FORWARD'); // Forward
+      } else if (e.keyCode === 40) { bot_command('BACK');    // Back
+      }
     }
-    // VY.log.write(`Torque = ${vybot.wheel_torque}, SteerAngle = ${vybot.desired_steer_angle}`)
   },false); 
 
   

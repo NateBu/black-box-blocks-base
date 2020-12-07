@@ -8,7 +8,7 @@ export function dynamics(swarm, dt, xbody, surface_derivs) {
   let ground_kinetic_friction = 0.2;
   let coefficient_of_restitution = 0.8;
   swarm.forEach(function(bot) {
-    controller(bot, 30, 30);
+    // controller(bot, 30, 30);
     dstate(bot, dt, gravity, ground_kinetic_friction, surface_derivs);
     dofs[bot.name+'_tx'] = bot.state.x;
     dofs[bot.name+'_ty'] = bot.state.y;
