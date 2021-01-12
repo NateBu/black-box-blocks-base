@@ -2,7 +2,7 @@ import { dstate } from '/vy/vybots/robots/vybot_alpha_dstate.js';
 import { collisions } from '/vy/vybots/robots/vybot_alpha_collisions.js';
 import { controller } from '/vy/vybots/robots/vybot_alpha_controller.js';
 
-export function dynamics(swarm, dt, xbody, surface_derivs) {
+export function dynamics(swarm, dt, xbody, surface_derivs, outer_radius) {
   let dofs = {};
   let gravity = -9.81;
   let ground_kinetic_friction = 0.2;
@@ -19,7 +19,7 @@ export function dynamics(swarm, dt, xbody, surface_derivs) {
     dofs[bot.name+'RightFrontWheel_rz'] = bot.state.steer_angle;
     dofs[bot.name+'LeftFrontWheel_rz'] = bot.state.steer_angle;
   });
-  let collis = collisions(swarm, coefficient_of_restitution, xbody);
+  let collis = collisions(swarm, xbody, coefficient_of_restitution, outer_radius);
   xbody.set_state(dofs);
   return {collisions:collis};
 };

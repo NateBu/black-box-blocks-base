@@ -38,10 +38,10 @@ let render_shape = function(vyth,xbody) {
     var geometry = null;
     if (shape.geometry.type === 'Extrusion') {
       geometry = extrusion(shape.geometry.arguments[0], 
-        shape.geometry.arguments[1]).applyMatrix(R);
+        shape.geometry.arguments[1]).applyMatrix4(R);
     } else {
       geometry = three_variable_arguments(
-        shape.geometry.type, shape.geometry.arguments).applyMatrix(R);
+        shape.geometry.type, shape.geometry.arguments).applyMatrix4(R);
     }
     var material = three_variable_arguments(
       shape.material.type, shape.material.arguments);
@@ -72,7 +72,7 @@ let render_inertia = function (vyth,xbody) {
   var center = new THREE.Vector3(xbody.com[0], xbody.com[1], xbody.com[2]);
   var R = new THREE.Matrix4().compose(center, q, scale);
   R.premultiply(xbody.R);
-  geometry.applyMatrix( R );
+  geometry.applyMatrix4( R );
   var material = new THREE.MeshNormalMaterial(
     {transparent:true, opacity:0.4, depthTest:true,depthWrite:true});
   var mesh = new THREE.Mesh( geometry, material );
@@ -204,7 +204,7 @@ let xtransform = function(xbody, currentState) {
       if ( (!node.hasOwnProperty('name')) ||
           (!node.name.startsWith('|')) ) continue;
       if (node instanceof THREE.Mesh && node.geometry && node.userData.hasOwnProperty('xbody')) {
-        node.geometry.applyMatrix( RxR[node.userData.xbody] );
+        node.geometry.applyMatrix4( RxR[node.userData.xbody] );
         node.geometry.verticesNeedUpdate = true;
       }
     }

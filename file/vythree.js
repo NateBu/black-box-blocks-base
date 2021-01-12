@@ -1,5 +1,9 @@
 import { VY } from '/vybase/VY.js';
 
+import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+import { OrbitControls } from 'https://unpkg.com/three/examples/jsm/controls/OrbitControls.js';
+window.THREE = THREE;
+
 export let three = {};
 let animate = function() {
   if (three.INACTIVE) {
@@ -14,7 +18,7 @@ let animate = function() {
 };
 
 three = {
-  ORBITCONTROLS:false,
+  ORBITCONTROLS:true,
   INACTIVE:false,
   scene:null, 
   camera:null, 
@@ -58,7 +62,7 @@ three = {
     div.innerHTML = '';
     div.appendChild(this.renderer.domElement);
     if (three.ORBITCONTROLS) {
-      this.controls = new THREE.OrbitControls( this.camera,  this.renderer.domElement);
+      this.controls = new OrbitControls( this.camera,  this.renderer.domElement);
       this.controls.enableDamping = true;
       this.controls.dampingFactor = 0.25;
     }
@@ -93,15 +97,3 @@ three = {
     this.scene.add(obj);
   }
 };
-
-// VY.on_publish('vy_three_camera',three.set_camera);
-// window.addEventListener("keydown", function(e){ console.log('A') });
-// require('file::@@:Base:three_orbit_controls.js');
-// window.addEventListener("keydown", function(e){ console.log('B') });
-let script2 = document.createElement('script');
-script2.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/108/three.min.js";
-script2.onload = function() { three.ready = true; }
-document.head.appendChild(script2); //or something of the likes
-
-// "https://cdn.jsdelivr.net/npm/three-orbitcontrols@2.110.3/OrbitControls.min.js"
-

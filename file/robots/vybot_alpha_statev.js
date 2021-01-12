@@ -1,3 +1,13 @@
+Math.wrap = function(q) {
+  let dq = ((q+Math.PI) % (2*Math.PI)) - Math.PI;
+  if (dq > Math.PI) {
+    dq -= Math.PI*2;
+  } else if (dq < Math.PI) {
+    dq += Math.PI*2;
+  }
+  return dq;
+}
+
 export function botstate_to_vec(bot) {
   return [bot.state.x, bot.state.y, bot.state.z, 
     bot.state.roll, bot.state.pitch, bot.state.yaw,
@@ -22,6 +32,15 @@ export function vec_to_botstate(xn,bot) {
   bot.state.pitchrate = xn[11];
   bot.state.yawrate = xn[12];
   bot.state.steer_rate = xn[13];
+  if (Math.abs(bot.state.steer_angle) + Math.abs(bot.state.steer_rate) < 0.01) {
+    bot.state.yawrate = 0;
+    // if (Math.abs(bot.state.vy) > 0.1 || Math.abs(bot.state.vx) > 0.1) {
+    //   let dq = Math.wrap(Math.atan2(bot.state.vy, bot.state.vx) - bot.state.yaw);
+    //   if (Math.abs(dq) < Math.PI/2) { dq += Math.PI };
+    //   bot.state.yaw += dq;
+    // }
+  }
+
 };
 
 export function botstate_init(bot) {

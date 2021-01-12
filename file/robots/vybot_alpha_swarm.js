@@ -3,7 +3,7 @@ import { body_generator } from '/vy/vybots/robots/vybot_alpha.js';
 import { botstate_init } from '/vy/vybots/robots/vybot_alpha_statev.js';
 
 export function swarm(number_of_swarms, bots_per_swarm, arena_size, three_bodies, swarm) {
-  var bot_specs = {
+  let bot_specs = {
     track_width:0.3,
     wheel_base:0.6,
     height:0.1,
@@ -18,7 +18,7 @@ export function swarm(number_of_swarms, bots_per_swarm, arena_size, three_bodies
 
   // Define the basis for each bot
   swarm.splice(0, swarm.length);
-  var specs = JSON.parse(JSON.stringify(bot_specs));
+  let specs = JSON.parse(JSON.stringify(bot_specs));
   specs.motion_state = 'DRIVE';
   specs.inHomeBase = false;
   specs.inEnergySource = false;
@@ -27,36 +27,22 @@ export function swarm(number_of_swarms, bots_per_swarm, arena_size, three_bodies
   specs.mode = "retrieve";
   specs.velIntegral = 0;
 
-  var inter_cluster_distance = arena_size / 20;
-  var smallradius = inter_cluster_distance / 4;
-  
-  for (var ii=0; ii<number_of_swarms; ii++) {
-    var qc = ii/number_of_swarms*2*Math.PI;
-    var xc = Math.cos(qc);
-    var yc = Math.sin(qc);
-    var zc = 0; //this.waves.surface_derivatives(xc,yc,0);
-    var hsl = [Math.floor((ii/number_of_swarms)*360),100,50];
-    var rgb = hsl_to_rgb(hsl[0]/360,hsl[1]/100,hsl[2]/100);
-    // output.swarmspecs.push({
-    //   'color':'hsl('+hsl[0]+','+hsl[1]+'%,'+hsl[2]+'%)',
-    //   'base':{x:xc,y:yc,z:zc.z,radius:5}
-    // });
-    for (var jj=0; jj<bots_per_swarm; jj++) {
-      var qb = qc + Math.PI + jj/bots_per_swarm*2*Math.PI;
-      var xb = Math.cos(qb);
-      var yb = Math.sin(qb);
-      var bot = JSON.parse(JSON.stringify(specs));
+  let cluster_radius = arena_size * 0.8;
+  for (let ii=0; ii<number_of_swarms; ii++) {
+    let hsl = [Math.floor((ii/number_of_swarms)*360), 100, 50];
+    let rgb = hsl_to_rgb(hsl[0]/360, hsl[1]/100, hsl[2]/100);
+    for (let jj=0; jj<bots_per_swarm; jj++) {
+      let qb = (ii*bots_per_swarm + jj)/(bots_per_swarm*number_of_swarms)*2*Math.PI;
+      let bot = JSON.parse(JSON.stringify(specs));
       bot.name = 'bot_'+ii+'_'+jj;
-      bot.bot_id = ii*bots_per_swarm+jj;
       bot.swarm_id = ii;
+      bot.bot_id = jj;
       botstate_init(bot);
-      bot.state.x = inter_cluster_distance*xc+smallradius*xb;
-      bot.state.y = inter_cluster_distance*yc+smallradius*yb;
+      bot.state.x = cluster_radius*Math.cos(qb);
+      bot.state.y = cluster_radius*Math.sin(qb);
+      bot.state.yaw = qb + Math.PI;
       body_generator(bot, three_bodies, rgb);
       swarm.push(bot);
     }
   }
-  // three_bodies.origin = {mode:'watch', 'type':'xview', xbody:'ground',
-  //   eye:[0,-arena_size/2,arena_size/5], center:[0,0,0], up:[0,0,1]
-  // };
 };

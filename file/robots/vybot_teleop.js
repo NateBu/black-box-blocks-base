@@ -7,15 +7,14 @@ const MIN_STEER_ANGLE = -0.55;
 const TORQUE_STEP = (MAX_TORQUE - MIN_TORQUE)/40;
 const STEER_STEP = (MAX_STEER_ANGLE - MIN_STEER_ANGLE)/20;
 const RESISTIVE_STEP = 1/40;
-let COMMAND = {steer:'NONE',throttle:'NONE'};
-
+let COMMAND = {steer:'NONE',throttle:'NONE',botindex:0};
 
 const bot_command = function(c) { 
   if (c=='RIGHT' || c=='LEFT') COMMAND.steer = c;
   if (c=='FORWARD' || c=='BACK') COMMAND.throttle = c;
 }
 
-export function teleop_setup(three, simcontrols, vybot, keydownfunc) {
+export function teleop_setup(XBODY, simcontrols, vybots, keydownfunc) {
   let el = document.querySelector('.vybotcontrols');
   if (el) el.parentNode.removeChild(el);
 
@@ -28,6 +27,11 @@ export function teleop_setup(three, simcontrols, vybot, keydownfunc) {
   setInterval(function() {
     if (!simcontrols.RUNNING) return;
     let dst = 0, dto = 0, dre = -RESISTIVE_STEP;
+
+    let swarmid = 0;
+    let botid = COMMAND.botindex % vybots.length;
+    let vybot = vybots[botid];
+  
     if (COMMAND.steer == 'NONE') {
       let curst = vybot.desired_steer_angle;
       let dst = Math.min(4*STEER_STEP,Math.abs(curst));
@@ -51,7 +55,8 @@ export function teleop_setup(three, simcontrols, vybot, keydownfunc) {
 
   const run = function() {
     simcontrols.RUNNING = !simcontrols.RUNNING;
-    three.INACTIVE = !simcontrols.RUNNING;
+    XBODY.three.ORBITCONTROLS = !simcontrols.RUNNING;
+    XBODY.three.INACTIVE = !simcontrols.RUNNING;
     add_run_text();
     VY.log.clear();
     VY.log.write('Spacebar = Pause Simulation');
@@ -78,12 +83,15 @@ export function teleop_setup(three, simcontrols, vybot, keydownfunc) {
     if (keydownfunc) {
       keydownfunc(e, bot_command);
     } else {
-      if (e.keyCode === 32)        { run();               // spacebar
-      } else if (e.keyCode === 37) { bot_command('LEFT');    // Left
-      } else if (e.keyCode === 39) { bot_command('RIGHT');   // Right
-      } else if (e.keyCode === 38) { bot_command('FORWARD'); // Forward
-      } else if (e.keyCode === 40) { bot_command('BACK');    // Back
-      }
+      let keyint = parseInt(e.key);
+      if (e.key === ' ')                { run(); }                 // spacebar
+      else if (!isNaN(keyint))          { COMMAND.botindex = keyint; }
+
+      if (!simcontrols.RUNNING) return;
+      if (e.key === 'ArrowLeft')   { bot_command('LEFT'); }   // Left
+      else if (e.key === 'ArrowRight')  { bot_command('RIGHT'); }  // Right
+      else if (e.key === 'ArrowUp')     { bot_command('FORWARD'); }// Forward
+      else if (e.key === 'ArrowDown')   { bot_command('BACK'); }   // Back
     }
   },false); 
 
