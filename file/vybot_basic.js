@@ -1,11 +1,13 @@
 console.clear();
-import { three } from "/vy/vybots/vythree.js"
-import { environment } from '/vy/vybots/robots/environment.js';
-import { surface_derivatives } from '/vy/vybots/math/sine_surface.js';
-import { teleop_setup } from '/vy/vybots/robots/vybot_teleop.js';
-import { xbodyf } from '/vy/vybots/robots/xbody.js';
-import { swarm } from '/vy/vybots/robots/vybot_alpha_swarm.js';
-import { dynamics } from '/vy/vybots/robots/vybot_alpha_dynamics.js';
+import { three } from "/vybots/vythree.js"
+import { environment } from '/vybots/robots/environment.js';
+import { surface_derivatives } from '/vybots/math/sine_surface.js';
+import { teleop_setup } from '/vybots/robots/vybot_teleop.js';
+import { xbodyf } from '/vybots/robots/xbody.js';
+import { swarm, swarm_color } from '/vybots/robots/vybot_alpha_swarm.js';
+import { dynamics } from '/vybots/robots/vybot_alpha_dynamics.js';
+import { control_panel } from '/vybots/robots/vybot_control_panel.js';
+
 let simcontrols = {RUNNING:false};
 let DT = 0.05;  // INTEGRATION INTERVAL
 let THREEDIV = document.querySelector('div.vybotworld');
@@ -14,13 +16,21 @@ let THREEDIV = document.querySelector('div.vybotworld');
 three.init(THREEDIV);
 
 // Set number of swarms and bots per swarm
-let number_of_swarms = 4;
-let bots_per_swarm = 2;
+let CONFIG = {
+  number_of_swarms: 4,
+  bots_per_swarm: 2,
+  arena_size: 50,
+  amplitude: 3,
+  swarms_config:[],
+  control: {}
+}
+for (var ii=0; ii<CONFIG.number_of_swarms; ii++) {
+  CONFIG.swarms_config.push(swarm_color(ii, CONFIG.number_of_swarms));
+}
+
 
 // Build the ground with it's surface derivatives
-let arena_size = 50;
-let amplitude = 3;
-let ground = environment(three, arena_size, amplitude);  
+let ground = environment(three, CONFIG);  
 
 let surface_derivs = function(x, y, yaw) {
   return surface_derivatives(x, y, yaw, ground.waves);
@@ -37,7 +47,7 @@ editor.setFontSize(20);
 editor.setValue('// bot_command("FORWARD");\n// bot_command("BACK");\n// bot_command("LEFT");\n// bot_command("RIGHT");\nkeydownfunc = function(e, bot_command) {\n  console.log("HI!");\n}\n');
 
 let INIT = function() {
-  swarm(number_of_swarms, bots_per_swarm, arena_size, THREE_BODIES, SWARM);
+  swarm(CONFIG, THREE_BODIES, SWARM);
   XBODY.init(THREE_BODIES); //degree_of_freedom_order
   let code = editor.getValue();
   try {
@@ -50,6 +60,7 @@ let INIT = function() {
 }
 INIT();
 THREEDIV.addEventListener("dblclick", INIT, false); 
+var canvas = document.getElementById("controlpanel");
 
 setInterval(function() {
   if (!simcontrols.RUNNING) return;
@@ -66,7 +77,7 @@ setInterval(function() {
   let rslts = {};
   let N = 1;
   for (var ii = 0; ii < N; ii++) {
-    rslts = dynamics(SWARM, DT/N, XBODY, surface_derivs, arena_size);
+    rslts = dynamics(SWARM, DT/N, XBODY, surface_derivs, CONFIG.arena_size);
   }
   rslts.collisions.forEach(function(c) {
     let boti = SWARM[c.ii];
@@ -86,5 +97,6 @@ setInterval(function() {
     }
     // console.log(boti.swarm_id,boti.score,botj.swarm_id,botj.score)
   });
+  control_panel(canvas, SWARM, CONFIG);
 
 },DT*1000);

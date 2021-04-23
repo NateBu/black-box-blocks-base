@@ -1,5 +1,5 @@
-import { box_inertia, ellipsoid_inertia } from '/vy/vybots/math/simple_inertias.js';
-import { arm_generator } from '/vy/vybots/robots/vybot_alpha_arm.js';
+import { box_inertia, ellipsoid_inertia } from '/vybots/math/simple_inertias.js';
+import { arm_generator } from '/vybots/robots/vybot_alpha_arm.js';
 
 var rgbToHex = function (rgb) { 
   var z = function(rgb) {

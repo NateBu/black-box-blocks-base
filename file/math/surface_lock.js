@@ -1,3 +1,5 @@
+import { R2xyz, xyz2R, mtranspose, mmult } from '/vybots/math/eulxyz.js';
+
 export function surface_lock(x,y,dxdt,dydt,z,dzdx,dzdy) {
   // Inputs:
   // x = x position of vehicle (m)
@@ -30,33 +32,10 @@ export function surface_lock(x,y,dxdt,dydt,z,dzdx,dzdy) {
   // up = R*[0,0,1]';     left = R*[0,1,0]';     nose = R*[1,0,0]'
   //   ... therefore: R = [nose,left,up]
   //R = [nose',left',up'];
-  let pitch = -Math.asin(nose[2]); //-Math.asin(R(3,1));
-  let cp = Math.cos(pitch);
-  let roll = 0, yaw = 0;
-  
-  if (cp===0 && pitch > 0) {
-      //a = R(1,2)/cp;
-      //b = R(1,3)/cp;
-      //roll = atan2(a,b);
-      roll = Math.atan2(left[0],up[0])
-      yaw = 0;
-  } else if (cp===0 && pitch < 0) {
-      //a = -R(1,2)/cp;
-      //b = -R(1,3)/cp;
-      //roll = atan2(a,b);
-      roll = Math.atan2(-left[0],-up[0])
-      yaw = 0;
-  } else {
-      // a = R(3,2)/cp;
-      // b = R(3,3)/cp;
-      roll = Math.atan2(left[2],up[2]); // atan2(a,b)
-      //a = R(2,1)/cp;
-      //b = R(1,1)/cp;
-      yaw = Math.atan2(nose[1],nose[0]); //atan2(a,b);
-  }
-  return {roll:roll,pitch:pitch,yaw:yaw,dzdt:dzdt};
+  let xyz = R2xyz(mtranspose([nose,left,up]));
+  xyz.dzdt = dzdt;
+  return xyz;
 };
-
 
 //function R=Rz(x); R=[[cos(x),-sin(x),0];[sin(x),cos(x),0];[0,0,1]];
 //function R=Rx(x); R=[[1,0,0];[0,cos(x),-sin(x)];[0,sin(x),cos(x)]];

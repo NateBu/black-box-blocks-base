@@ -1,12 +1,13 @@
-import { dstate } from '/vy/vybots/robots/vybot_alpha_dstate.js';
-import { collisions } from '/vy/vybots/robots/vybot_alpha_collisions.js';
-import { controller } from '/vy/vybots/robots/vybot_alpha_controller.js';
+import { dstate } from '/vybots/robots/vybot_alpha_dstate.js';
+import { collisions } from '/vybots/robots/vybot_alpha_collisions.js';
+import { controller } from '/vybots/robots/vybot_alpha_controller.js';
 
 export function dynamics(swarm, dt, xbody, surface_derivs, outer_radius) {
   let dofs = {};
   let gravity = -9.81;
   let ground_kinetic_friction = 0.2;
   let coefficient_of_restitution = 0.8;
+
   swarm.forEach(function(bot) {
     // controller(bot, 30, 30);
     dstate(bot, dt, gravity, ground_kinetic_friction, surface_derivs);

@@ -122,15 +122,15 @@ export function setup_vyd3(call_ui_method, get_window_size, parentNode) {
     vyd3.svg.append("g").attr("class", "y axis minor _grid").call(vyd3.yAxisMinor);
 
     // 2. Dynamic text with mouse move
-    vyd3.svg.append("text").attr({id: "mouseloc", x: wh.width-10, y: 15,'text-anchor':'end'}).text('');
+    // vyd3.svg.append("text").attr({id: "mouseloc", x: wh.width-10, y: 15,'text-anchor':'end'}).text('');
 
-    d3.select(vyd3.d3svg).on("mousemove", function(e) {
-      var coords = d3.mouse(this);
-      d3.select(`#${vyd3.id} #mouseloc`).text('x='+vyd3.xScale.invert(coords[0]).toFixed(2)+' y='+vyd3.yScale.invert(coords[1]).toFixed(2));
-      //let canZoom = vyd3.d3top.querySelector('button.panzoom').classList.contains('btn-danger');
-      //if (!canZoom) return;  // Don't drag if panzoom is enabled
-      call_ui_method("d3_mousemove", {this:this,zoomable:vyd3.zoomable});
-    });
+    // d3.select(vyd3.d3svg).on("mousemove", function(e) {
+    //   var coords = d3.mouse(this);
+    //   d3.select(`#${vyd3.id} #mouseloc`).text('x='+vyd3.xScale.invert(coords[0]).toFixed(2)+' y='+vyd3.yScale.invert(coords[1]).toFixed(2));
+    //   //let canZoom = vyd3.d3top.querySelector('button.panzoom').classList.contains('btn-danger');
+    //   //if (!canZoom) return;  // Don't drag if panzoom is enabled
+    //   call_ui_method("d3_mousemove", {this:this,zoomable:vyd3.zoomable});
+    // });
 
     d3.select(vyd3.d3svg).on('keydown', function(d,i) {
       d3.event.stopPropagation();

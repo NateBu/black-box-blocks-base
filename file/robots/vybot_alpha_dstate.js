@@ -1,39 +1,44 @@
-import { surface_lock } from '/vy/vybots/math/surface_lock.js';
-import { rk4 } from '/vy/vybots/math/rk.js';
-import { botstate_to_vec, vec_to_botstate } from '/vy/vybots/robots/vybot_alpha_statev.js';
+import { surface_lock } from '/vybots/math/surface_lock.js';
+import { rk4 } from '/vybots/math/rk.js';
+import { botstate_to_vec, vec_to_botstate } from '/vybots/robots/vybot_alpha_statev.js';
+import { R2xyz, xyz2R, mtranspose, mmult } from '/vybots/math/eulxyz.js';
 
 let derivs = function(t,x,params) {
   // x = [px,py,yaw,steer_angle,   vx,vy,yawrate,dsteer_angledt]
   let bot = params.bot;
   vec_to_botstate(x,bot);
-  let cq = Math.cos(bot.state.yaw);
-  let sq = Math.sin(bot.state.yaw);
-  let vmag = Math.sqrt(bot.state.vx*bot.state.vx + bot.state.vy*bot.state.vy + 
-                    bot.state.vz*bot.state.vz);
+  let g_R_l = xyz2R(bot.state);
+  let l_R_g = mtranspose(g_R_l);
+  let vbody = mmult(l_R_g,[bot.state.vx, bot.state.vy, bot.state.vz]);
+  let vmag = Math.sqrt(vbody[0]*vbody[0] + vbody[1]*vbody[1] + vbody[2]*vbody[2]);
   let steer_acc_ = 0; //4*(bot.desired_steer_angle - bot.state.steer_angle) - 10*bot.state.steer_rate;
   bot.state.steer_rate = 5*(bot.desired_steer_angle - bot.state.steer_angle);
   let yaw_acc_ = 0, ax_ = 0, ay_ = 0, az_ = 0;
   if (bot.motion_state === 'FREEFALL') {  az_ = params.gravity;  // Projectile motion
   } else if (bot.motion_state === 'GROUNDCOLLISION') {
-  } else if (bot.motion_state === 'DRIVE') {
-    let vlong = cq*bot.state.vx + sq*bot.state.vy; // TODO INCLUDE Z;
-    // bot.state.yawrate = Math.tan(bot.state.steer_angle)/bot.wheel_base*vlong;
-    let Fgx = -Math.sin(bot.state.pitch)*bot.mass*params.gravity;
-    let Faero = -bot.drag_coefficient*vmag*vlong;
-    let Fprop = bot.wheel_torque/bot.wheel_radius;
-    let acceleration = (Fprop + Faero + Fgx)/bot.mass;
-    ax_ = acceleration*cq - sq*vlong*bot.state.yawrate;
-    ay_ = acceleration*sq + cq*vlong*bot.state.yawrate;
-    let sec = 1/Math.cos(bot.state.steer_angle);
-    yaw_acc_ = (vlong*sec*sec*bot.state.steer_rate + 
-      acceleration*Math.tan(bot.state.steer_angle))/bot.wheel_base;
-  } else if (bot.motion_state === 'SLIDE') {
-    var friction = Math.abs(params.gravity*params.ground_kinetic_friction); // TODO attitude adjust
-    ax_ = -bot.state.vx/vmag*friction;
-    ay_ = -bot.state.vy/vmag*friction;
-    az_ = -bot.state.vz/vmag*friction;
-    if (vmag <= 0.5) { // Slow enough to stop
-      ax_ = 0; ay_ = 0; az_ = 0; bot.motion_state = 'DRIVE';
+  } else {
+    let time_imp = 0.2;
+    let vlong = vbody[0]
+    let a_stop_friction = vbody.map(v => -v/time_imp);
+    bot.state.yawrate = Math.tan(bot.state.steer_angle)/bot.wheel_base*vlong;
+    if (bot.motion_state === 'DRIVE') {
+      let Fprop = bot.wheel_torque/bot.wheel_radius - Math.sin(bot.state.pitch)*bot.mass*params.gravity;
+      let Faero = -bot.drag_coefficient*vmag*vlong;
+      let accv = mmult(g_R_l,[(Fprop + Faero)/bot.mass,  vlong*bot.state.yawrate + a_stop_friction[1],  0]);
+      if (bot.wheel_torque == 0) {
+        accv = mmult(g_R_l,a_stop_friction);
+      }
+      ax_ = accv[0];
+      ay_ = accv[1];
+      az_ = accv[2];
+    } else if (bot.motion_state === 'SLIDE') {
+      var friction = Math.abs(params.gravity*params.ground_kinetic_friction); // TODO attitude adjust
+      ax_ = -bot.state.vx/vmag*friction;
+      ay_ = -bot.state.vy/vmag*friction;
+      az_ = -bot.state.vz/vmag*friction;
+      if (Math.abs(vlong) <= 2) { // Slow enough to grip/drive
+        ax_ = 0; ay_ = 0; az_ = 0; bot.motion_state = 'DRIVE';
+      }
     }
   }
   return [bot.state.vx, bot.state.vy, bot.state.vz, 

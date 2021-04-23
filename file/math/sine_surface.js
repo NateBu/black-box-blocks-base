@@ -1,4 +1,5 @@
-import { get_RNG } from '/vy/vybots/tools/seedrandom.js'; 
+import { get_RNG } from '/vybots/tools/seedrandom.js'; 
+import { grid_surface } from '/vybots/math/grid_surface.js'; 
 
 const twopi = 2*Math.PI;
 export function surface_derivatives(x, y, yaw, waves) {
@@ -28,7 +29,7 @@ export function surface_derivatives(x, y, yaw, waves) {
     return {z:z,dzdx:dzdx,dzdy:dzdy,d2zdx2:d2zdx2,d2zdy2:d2zdy2,d2zdxdy:d2zdxdy};
   };
 
-export function sine_surface(seed,gridd,maxamp,nfacets) {
+export function round_sine_surface(seed,gridd,maxamp,nfacets) {
   // A seeded RNG (same results for = values of gridd)
   let rand = get_RNG(''+seed);
   var waves = [];
@@ -40,7 +41,7 @@ export function sine_surface(seed,gridd,maxamp,nfacets) {
     waves.push({'amplitude':amp,'wavelength':wvl,'azimuth':phi,'phase':psi});
   }
 
-  var height = function(x, y) {
+  let heightf = function(x, y) {
     var ztarget = 0;
     for (var ii = 0; ii < waves.length; ii++) {
       // Length along wave ii (normalized to wavelength)
@@ -58,31 +59,17 @@ export function sine_surface(seed,gridd,maxamp,nfacets) {
     return ztarget;
   };
 
-  var geometry = new THREE.Geometry();
-  var d = gridd;
-  var n = Math.max(2,Math.min(200,nfacets));
-  var xmax = d, xmin = -d, ymax = d, ymin = -d;
-  var cols = n;
-  var rows = n;
-  var yspc = (ymax-ymin)/rows;
-  var xspc = (xmax-xmin)/cols;
-  for (var r = 0; r <= rows; r++) {
-    for (var c = 0; c <= cols; c++) {
-      var x = xmin + c*xspc;
-      var y = ymin + r*yspc;
-      var z = height(x,y);
-      geometry.vertices.push( new THREE.Vector3(x,y,z) );
-      if (c<cols && r<rows) {
-        var f0 = (r)    *(cols+1) + (c) + 1;
-        var f1 = (r + 1)*(cols+1) + (c) + 1;
-        var f2 = (r + 1)*(cols+1) + (c);
-        geometry.faces.push( new THREE.Face3( f0, f1, f2 ) );
-        f0 = (r + 1)*(cols+1) + (c);
-        f1 = (r)    *(cols+1) + (c);
-        f2 = (r)    *(cols+1) + (c) + 1;
-        geometry.faces.push( new THREE.Face3( f0, f1, f2 ) );
-      }
-    }
-  }
+  let filterf = function(x0, y0, x1, y1) {
+    return Math.min( Math.sqrt(x0*x0+y0*y0) , 
+      Math.sqrt(x1*x1+y1*y1) , 
+      Math.sqrt(x0*x0+y1*y1) ,
+      Math.sqrt(x1*x1+y0*y0)) < gridd;
+  };
+
+  let n = Math.max(2, Math.min(200, nfacets));
+  let geometry = grid_surface(-gridd, gridd, -gridd, gridd, n, n, heightf, filterf);
+  
   return {waves:waves, geometry:geometry};
 };
+
+

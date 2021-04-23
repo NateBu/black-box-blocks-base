@@ -1,8 +1,16 @@
-import { hsl_to_rgb } from '/vy/vybots/tools/hsl_to_rgb.js';
-import { body_generator } from '/vy/vybots/robots/vybot_alpha.js';
-import { botstate_init } from '/vy/vybots/robots/vybot_alpha_statev.js';
+import { hsl_to_rgb } from '/vybots/tools/hsl_to_rgb.js';
+import { body_generator } from '/vybots/robots/vybot_alpha.js';
+import { botstate_init } from '/vybots/robots/vybot_alpha_statev.js';
 
-export function swarm(number_of_swarms, bots_per_swarm, arena_size, three_bodies, swarm) {
+export function swarm_color(swarmid, number_of_swarms) {
+  let hsl = [Math.floor((swarmid/number_of_swarms)*360), 100, 50];
+  let rgb = hsl_to_rgb(hsl[0]/360, hsl[1]/100, hsl[2]/100);
+  let rgbs = 'rgb('+rgb.map(c => `${Math.floor(c*255)}`).join(',')+')';
+  let q = swarmid/number_of_swarms*2*Math.PI;
+  return {rgb:rgb, rgbs:rgbs, q:q, dq:2*Math.PI/number_of_swarms};
+}
+
+export function swarm(CONFIG, three_bodies, swarm) {
   let bot_specs = {
     track_width:0.3,
     wheel_base:0.6,
@@ -27,12 +35,11 @@ export function swarm(number_of_swarms, bots_per_swarm, arena_size, three_bodies
   specs.mode = "retrieve";
   specs.velIntegral = 0;
 
-  let cluster_radius = arena_size * 0.8;
-  for (let ii=0; ii<number_of_swarms; ii++) {
-    let hsl = [Math.floor((ii/number_of_swarms)*360), 100, 50];
-    let rgb = hsl_to_rgb(hsl[0]/360, hsl[1]/100, hsl[2]/100);
-    for (let jj=0; jj<bots_per_swarm; jj++) {
-      let qb = (ii*bots_per_swarm + jj)/(bots_per_swarm*number_of_swarms)*2*Math.PI;
+  let cluster_radius = CONFIG.arena_size * 0.8;
+  for (let ii=0; ii<CONFIG.number_of_swarms; ii++) {
+    let swarmp = CONFIG.swarms_config[ii];
+    for (let jj=0; jj<CONFIG.bots_per_swarm; jj++) {
+      let qb = swarmp.q + (jj+1)*swarmp.dq/(CONFIG.bots_per_swarm+1);
       let bot = JSON.parse(JSON.stringify(specs));
       bot.name = 'bot_'+ii+'_'+jj;
       bot.swarm_id = ii;
@@ -41,7 +48,7 @@ export function swarm(number_of_swarms, bots_per_swarm, arena_size, three_bodies
       bot.state.x = cluster_radius*Math.cos(qb);
       bot.state.y = cluster_radius*Math.sin(qb);
       bot.state.yaw = qb + Math.PI;
-      body_generator(bot, three_bodies, rgb);
+      body_generator(bot, three_bodies, swarmp.rgb);
       swarm.push(bot);
     }
   }
