@@ -1,4 +1,4 @@
-FROM ubuntu:bionic as ${VYNAME}
+FROM ubuntu:bionic
 RUN apt-get update && apt install -y wget \
   python3 \
   python3-pip \
@@ -16,8 +16,6 @@ RUN sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y ros-eloquent-ros-base
                                                                 #ros-eloquent-desktop
 
-
 # wget --no-check-certificate https://github.com/nlohmann/json/blob/develop/single_include/nlohmann/json.hpp
 
-#vy {"context":"."}
-#vy {"source":{"ubuntu:bionic":""}}
+#VY SOURCE ubuntu:bionic
